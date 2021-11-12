@@ -159,7 +159,12 @@ export class FsCmsPageNormalizer implements Converter<FsCmsPageInterface, CmsStr
   }
 
   private convertComponentRecursive(component: any): CmsComponent | undefined {
-    if (
+    if (component?.otherProperties?.fs_processed) {
+      Object.keys(component).forEach((property) => {
+        this.convertComponentRecursive(component[property]);
+      });
+      this.target.components.push(component);
+    } else if (
       component != null &&
       typeof component === 'object' &&
       ['template', 'formData', 'identifier'].every((entry) => Object.keys(component).includes(entry)) &&
@@ -175,6 +180,7 @@ export class FsCmsPageNormalizer implements Converter<FsCmsPageInterface, CmsStr
       Object.keys(component).forEach((item) => {
         delete component[item];
       });
+      result.otherProperties = { ...result.otherProperties, fs_processed: true };
       Object.assign(component, result);
       this.target.components.push(component);
     } else {
