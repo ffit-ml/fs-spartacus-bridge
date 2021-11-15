@@ -100,11 +100,9 @@ export class CmsStructureModelMerger {
         return slotName;
       }
       // Reference names are in lower case in FirstSpirit, so we must first find the correct spelling from the configuration
-      const fsConfig = Seq(this.fsMangedSlotsMergeConfig).find(([key]) => key && key.toLocaleLowerCase() === slotName.toLocaleLowerCase());
-      if (Array.isArray(fsConfig)) {
-        const [, slotConfig] = fsConfig;
-        return slotConfig && slotConfig.name;
-      }
+      const fsConfig = Seq(this.fsMangedSlotsMergeConfig.keys()).find((key) => key?.toLocaleLowerCase() === slotName.toLocaleLowerCase());
+      const slotConfig = this.fsMangedSlotsMergeConfig.get(fsConfig);
+      return slotConfig?.name;
     }
   }
 

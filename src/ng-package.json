@@ -12,5 +12,5 @@
     },
     "entryFile": "./public-api.ts"
   },
-  "whitelistedNonPeerDependencies": ["immutable"]
+  "allowedNonPeerDependencies": ["immutable"]
 }
