@@ -71,7 +71,7 @@ declare module 'fs-tpp-api/snap' {
     fsType: string;
   }
 
-  interface SNAP {
+  export interface SNAP {
     isConnected: Promise<boolean>;
     createSection(previewId: string, options?: CreateSectionOptions): Promise<CreateSectionResult> | void;
     createPage(path: string, uid: string, template: string, options?: CreatePageOptions): Promise<CreatePageResult> | void;

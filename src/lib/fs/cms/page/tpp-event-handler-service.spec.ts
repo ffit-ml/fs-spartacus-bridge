@@ -11,7 +11,7 @@ import { of } from 'rxjs';
 
 import { FsSpartacusBridgeModule } from '../../../fs-spartacus-bridge.module';
 import { CaasClientFactory } from '../../caas/caas-client.factory';
-import { Injectable, NgZone } from '@angular/core';
+import { Inject, Injectable, NgZone, PLATFORM_ID } from '@angular/core';
 
 import createSpy = jasmine.createSpy;
 import Spy = jasmine.Spy;
@@ -36,9 +36,10 @@ class MockTppWrapperService extends TppWrapperService {
       uid: DEFAULT_UID,
       displayName: DEFAULT_PAGE_NAME,
       name: DEFAULT_PAGE_NAME,
-    }
+    },
+    @Inject(PLATFORM_ID) platformId?: string
   ) {
-    super();
+    super(platformId);
   }
   onRequestPreviewElementHandler: (previewId: string) => void;
 

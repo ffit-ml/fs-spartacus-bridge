@@ -5,34 +5,47 @@ import { NavigationMessageHandlerService } from './navigation-message-handler.se
 import { PreviewPageService } from './preview/preview-page.service';
 
 import createSpy = jasmine.createSpy;
+import { WindowRef } from '@spartacus/core';
 
 @Injectable()
 class MockPreviewPageService extends PreviewPageService {
   navigateTo = createSpy('PreviewPageService.navigateTo').and.callFake(async (hybrisPageId: string) => Promise.resolve(true));
 }
 
+class MockWindowRef extends WindowRef {
+  get nativeWindow(): Window | undefined {
+    return window;
+  }
+}
+
 describe('NavigationMessageEventHandlerService', () => {
+  let mockWindowRef: MockWindowRef;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
-      providers: [{ provide: PreviewPageService, useClass: MockPreviewPageService }],
+      providers: [
+        { provide: PreviewPageService, useClass: MockPreviewPageService },
+        { provide: WindowRef, useClass: MockWindowRef }
+      ],
     });
 
     spyOn(console, 'error').and.callThrough();
+    mockWindowRef = TestBed.inject(WindowRef)
   });
 
   it('should add event listener on initialization', () => {
     const navigationMessageHandlerService = TestBed.inject(NavigationMessageHandlerService);
-    spyOn(window, 'addEventListener');
+    spyOn(mockWindowRef.nativeWindow, 'addEventListener');
     navigationMessageHandlerService.initialize();
-    expect(window.addEventListener).toHaveBeenCalled();
+    expect(mockWindowRef.nativeWindow.addEventListener).toHaveBeenCalled();
   });
 
   it('should remove event listener on destroy', () => {
     const navigationMessageHandlerService = TestBed.inject(NavigationMessageHandlerService);
-    spyOn(window, 'removeEventListener');
+    spyOn(mockWindowRef.nativeWindow, 'removeEventListener');
     navigationMessageHandlerService.destroy();
-    expect(window.removeEventListener).toHaveBeenCalled();
+    expect(mockWindowRef.nativeWindow.removeEventListener).toHaveBeenCalled();
   });
 
   describe('handleNavigationMessage', () => {

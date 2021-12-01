@@ -3,6 +3,7 @@ import { GlobalMessageService, GlobalMessageType, HttpErrorHandler, Priority } f
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse, HttpRequest } from '@angular/common/http';
 import { FsSpartacusBridgeConfig } from 'fs-spartacus-common';
+import { take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -24,7 +25,9 @@ export class CaasForbiddenHandler extends HttpErrorHandler {
   }
 
   handleError(request: HttpRequest<any>, errorResponse: HttpErrorResponse): void {
-    this.tppStatusService.isFirstSpiritPreview().subscribe((previewMode) => {
+    this.tppStatusService.isFirstSpiritPreview().pipe(
+      take(1)
+    ).subscribe((previewMode: boolean) => {
       if (this.isCaasRequest(request)) {
         this.handleCaasError(previewMode);
       } else {
