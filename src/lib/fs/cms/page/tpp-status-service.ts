@@ -35,7 +35,7 @@ export class TppStatusService implements OnDestroy {
       if (isFirstSpiritPreview) {
         renderer.setAttribute(this.document.body, 'dnd-orient', 'horizontal');
         this.overrideTranslateButton();
-        this.disableCreateComponentButton();
+        this.adjustCreateComponentPosition();
         this.navigationMessageHandlerService.initialize();
       } else {
         renderer.removeAttribute(this.document.body, 'dnd-orient');
@@ -80,10 +80,24 @@ export class TppStatusService implements OnDestroy {
   }
 
   /*
-  remove create-component button in content creator since it is concealed by edit-component buttons.
-  buttons will be fixed with SPART-
+  add style classes and corresponding styles to DOM to position the CreateComponentButton on the Left of the component.
+  This method is only called once so there is no overflow in style tags.
   */
-  private async disableCreateComponentButton(): Promise<void> {
-    this.TPP_SNAP.overrideDefaultButton('create-component', null);
+  private async adjustCreateComponentPosition(): Promise<void> {
+    this.document.head.appendChild(document.createElement('style')).innerHTML = `
+      .tpp-buttons.is-component { right: auto; }
+      .tpp-buttons.is-component .tpp-icon-edit { background: none; }
+    `;
+    const originalMethod = this.TPP_SNAP._buttons
+      .find(({ _name }) => _name === 'create-component')
+      .isEnabled
+    this.TPP_SNAP.overrideDefaultButton('create-component', {
+      isEnabled: async (scope) => {
+        const enabled = originalMethod(scope);
+        if (enabled && !scope.$button.parentElement.matches('.is-component'))
+          scope.$button.parentElement.classList.add('is-component');
+        return enabled;
+      }
+    });
   }
 }

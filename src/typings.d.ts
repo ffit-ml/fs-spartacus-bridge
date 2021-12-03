@@ -73,6 +73,7 @@ declare module 'fs-tpp-api/snap' {
 
   export interface SNAP {
     isConnected: Promise<boolean>;
+    _buttons: Button[];
     createSection(previewId: string, options?: CreateSectionOptions): Promise<CreateSectionResult> | void;
     createPage(path: string, uid: string, template: string, options?: CreatePageOptions): Promise<CreatePageResult> | void;
     getPreviewElement(): Promise<string>;
@@ -90,8 +91,10 @@ declare module 'fs-tpp-api/snap' {
   }
 
   export interface Button {
-    getItems(scope: ButtonScope): any[];
-    execute(scope: ButtonScope, item: any): Promise<void>;
+    _name?: string;
+    getItems?(scope: ButtonScope): any[];
+    execute?(scope: ButtonScope, item: any): Promise<void>;
+    isEnabled?(scope: ButtonScope): Promise<boolean>;
   }
 
   export interface ButtonScope {
