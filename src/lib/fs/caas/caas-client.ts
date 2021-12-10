@@ -10,7 +10,7 @@ export class CaasClient {
     this.collectionUrl = caasCollection.collectionUrl();
   }
 
-  getByUid(name: string, language: string, altName?: string) {
+  getByUid(name: string, language: string, altName?: string, country?: string) {
     altName = typeof altName === 'string' && altName.trim().length > 0 ? altName : undefined;
     return this.httpClient
       .get(this.collectionUrl, {
@@ -19,10 +19,17 @@ export class CaasClient {
         },
         params: {
           filter: `{'$or':[
-            {'$and':[{'$or':[{'uid':'${name}'},{'uid':'${name?.toLocaleLowerCase()}'}]},{'locale.language':'${language}'}]},
-            {'page.formData.pt_seoUrl.value':'${altName || name}'},
-            {'page.formData.pt_seoUrl.value':'${altName || name?.toLocaleLowerCase()}'}
-          ]}`,
+                      {'$and':[
+                        {'$or':[
+                          {'uid':'${name}'},
+                          {'uid':'${name?.toLocaleLowerCase()}'}
+                        ]},
+                        {'locale.language':'${language}'},
+                        ${country?.length === 2 ? '{\'locale.country\': \'' + country + '\'}' : ''}
+                      ]},
+                      {'page.formData.pt_seoUrl.value':'${altName || name}'},
+                      {'page.formData.pt_seoUrl.value':'${altName || name?.toLocaleLowerCase()}'}
+                    ]}`,
         },
       })
       .pipe(
@@ -34,7 +41,7 @@ export class CaasClient {
       );
   }
 
-  getPageSections(name: string, language: string, altName?: string) {
+  getPageSections(name: string, language: string, country: string, altName?: string) {
     altName = typeof altName === 'string' && altName.trim().length > 0 ? altName : undefined;
     return this.httpClient
       .get(this.collectionUrl, {
@@ -43,10 +50,17 @@ export class CaasClient {
         },
         params: {
           filter: `{'$or':[
-            {'$and':[{'$or':[{'uid':'${name}'},{'uid':'${name?.toLocaleLowerCase()}'}]},{'locale.language':'${language}'}]},
-            {'page.formData.pt_seoUrl.value':'${altName || name}'},
-            {'page.formData.pt_seoUrl.value':'${altName || name?.toLocaleLowerCase()}'}
-          ]}`,
+                      {'$and':[
+                          {'$or':[
+                              {'uid':'${name}'},
+                              {'uid':'${name?.toLocaleLowerCase()}'}
+                            ]},
+                          {'locale.language':'${language}'},
+                          {'locale.country': '${country}'}
+                        ]},
+                      {'page.formData.pt_seoUrl.value':'${altName || name}'},
+                      {'page.formData.pt_seoUrl.value':'${altName || name?.toLocaleLowerCase()}'}
+                    ]}`,
           rep: 's',
           keys: `{'page.children.children':1}`,
         },

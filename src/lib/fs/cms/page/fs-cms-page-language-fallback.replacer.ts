@@ -13,6 +13,7 @@ export class FsCmsPageLanguageFallbackReplacer implements Converter<FsCmsPageInt
   private source: FsCmsPageInterface;
   private identifier2ObjectMap: Map<string, any[]>;
   private fallbackLanguage: string;
+  private fallbackCountry: string;
 
   constructor(private caasClientFactory: CaasClientFactory, private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig) {}
 
@@ -25,6 +26,7 @@ export class FsCmsPageLanguageFallbackReplacer implements Converter<FsCmsPageInt
 
     if (this.fsSpartacusBridgeConfig.fallbackLanguage && this.fsSpartacusBridgeConfig.fallbackLanguage !== '') {
       this.fallbackLanguage = this.fsSpartacusBridgeConfig.fallbackLanguage.substring(0, 2);
+      this.fallbackCountry = this.fsSpartacusBridgeConfig.fallbackLanguage.substring(3)
     } else {
       // if no fallback language is configured in the bridge config return the source because no section can be replaced
       return of(source);
@@ -87,8 +89,9 @@ export class FsCmsPageLanguageFallbackReplacer implements Converter<FsCmsPageInt
 
   private performFallbackRequest(caasClientObservable: Observable<CaasClient>) {
     return caasClientObservable.pipe(
-      map((caasClient) =>
-        this.identifier2ObjectMap.size > 0 ? caasClient.getPageSections(this.source.page.name, this.fallbackLanguage) : of(undefined)
+      map((caasClient) => this.identifier2ObjectMap.size > 0
+        ? caasClient.getPageSections(this.source.page.name, this.fallbackLanguage, this.fallbackCountry)
+        : of(undefined)
       ),
       switchAll(),
       map((caasResponse) => this.findSectionsInCaasResponse(caasResponse)),

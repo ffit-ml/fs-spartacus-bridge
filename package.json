@@ -11,7 +11,8 @@
     "uglify-dist": "node ./build-scripts/uglify.js ./dist/fs-spartacus-bridge --source-map",
     "lint": "ng lint",
     "lint:staged": "lint-staged -r -v",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "prepare": "npm run build"
   },
   "private": true,
   "dependencies": {
