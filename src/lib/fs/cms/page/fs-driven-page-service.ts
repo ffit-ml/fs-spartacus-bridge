@@ -1,10 +1,10 @@
 import { FsCmsPageContextFactory } from './fs-cms-page.context-factory';
 import { Observable, isObservable } from 'rxjs';
-import { CmsStructureModel, CmsPageAdapter, PageType } from '@spartacus/core';
+import { CmsStructureModel, CmsPageAdapter, PageType, BaseSiteService } from '@spartacus/core';
 import { Injectable } from '@angular/core';
 import { CmsStructureModelResponseFactory } from './cms-structure-model-response-factory';
 import { FsSpartacusBridgeConfig, arrayify } from 'fs-spartacus-common';
-import { map, take } from 'rxjs/operators';
+import { first, map, take } from 'rxjs/operators';
 import { getFsManagedPageConfigByTemplateId } from '../../util/helper';
 
 @Injectable({
@@ -15,14 +15,19 @@ export class FsDrivenPageService {
     private occCmsPageAdapter: CmsPageAdapter,
     private occResponseFactory: CmsStructureModelResponseFactory,
     private pageContextFactory: FsCmsPageContextFactory,
-    private bridgeConfig: FsSpartacusBridgeConfig
+    private bridgeConfig: FsSpartacusBridgeConfig,
+    private baseSiteService: BaseSiteService
   ) {}
 
   process(fsCmsPage: CmsStructureModel): null | Observable<CmsStructureModel> {
     if (fsCmsPage) {
       const templateId = fsCmsPage?.page?.template?.toLocaleLowerCase();
       if (templateId) {
-        const fsManagedPageConfig = getFsManagedPageConfigByTemplateId(arrayify(this.bridgeConfig?.firstSpiritManagedPages), templateId);
+        let baseSite;
+        this.baseSiteService.getActive().pipe(first()).subscribe(
+          activeBaseSite => baseSite = activeBaseSite
+        );
+        const fsManagedPageConfig = getFsManagedPageConfigByTemplateId(arrayify(this.bridgeConfig?.bridge[baseSite].firstSpiritManagedPages), templateId);
 
         if (fsManagedPageConfig) {
           const { sapPageIdentifier, sapPageType } = fsManagedPageConfig;

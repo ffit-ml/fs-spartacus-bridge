@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Converter } from '@spartacus/core';
+import { BaseSiteService, Converter } from '@spartacus/core';
 
 import { FsCmsPageInterface, FormData, Value } from './fs-cms-page.interface';
-import { map, filter, take, switchAll } from 'rxjs/operators';
+import { map, filter, take, switchAll, first } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { CaasClientFactory } from '../../caas/caas-client.factory';
 import { CaasClient } from '../../caas/caas-client';
@@ -15,7 +15,11 @@ export class FsCmsPagePreparer implements Converter<FsCmsPageInterface, Observab
   private identifier2ObjectMap: Map<string, any[]>;
   private identifier2FallbackObjectMap: Map<string, any[]>;
   private fallbackLocale: string;
-  constructor(private caasClientFactory: CaasClientFactory, private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig) {}
+  constructor(
+    private caasClientFactory: CaasClientFactory,
+    private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig,
+    private baseSiteService: BaseSiteService,
+  ) {}
 
   convert(source: FsCmsPageInterface | null | undefined): Observable<FsCmsPageInterface> {
     // null is a valid value for source, because it indicates,
@@ -24,8 +28,12 @@ export class FsCmsPagePreparer implements Converter<FsCmsPageInterface, Observab
       return of(null);
     }
 
-    if (this.fsSpartacusBridgeConfig.fallbackLanguage && this.fsSpartacusBridgeConfig.fallbackLanguage !== '') {
-      this.fallbackLocale = this.fsSpartacusBridgeConfig.fallbackLanguage;
+    let baseSite;
+    this.baseSiteService.getActive().pipe(first()).subscribe(
+      activeBaseSite => baseSite = activeBaseSite
+    );
+    if (this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage && this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage !== '') {
+      this.fallbackLocale = this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage;
     }
 
     const caasClientFactoryObservable = this.caasClientFactory.createCaasClient().pipe(take(1));

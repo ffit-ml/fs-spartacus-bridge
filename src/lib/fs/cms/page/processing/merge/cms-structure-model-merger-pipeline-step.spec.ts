@@ -19,7 +19,7 @@ describe('CmsStructureModelMergerPipelineStep', () => {
 
     const factory = new (class MockCmsStructureModelMergerFactory extends CmsStructureModelMergerFactory {
       createFsCmsPageMerger = () => merger;
-    })(null, null);
+    })(null, null, null);
 
     const pipelineStep = new CmsStructureModelMergerPipelineStep(factory);
     const originalPage = { page: { template: 'MyPageTemplate' } } as CmsStructureModel;
@@ -30,7 +30,7 @@ describe('CmsStructureModelMergerPipelineStep', () => {
   it('should return the original page, if the merger factory returns no result', () => {
     const factory = new (class MockCmsStructureModelMergerFactory extends CmsStructureModelMergerFactory {
       createFsCmsPageMerger = () => undefined;
-    })(null, null);
+    })(null, null, null);
 
     const pipelineStep = new CmsStructureModelMergerPipelineStep(factory);
     const originalPage = { page: { template: 'MyPageTemplate' } } as CmsStructureModel;
@@ -43,7 +43,7 @@ describe('CmsStructureModelMergerPipelineStep', () => {
     const merger = new CmsStructureModelMerger(firstSpiritManagedPage, null);
     const factory = new (class MockCmsStructureModelMergerFactory extends CmsStructureModelMergerFactory {
       createFsCmsPageMerger = () => merger;
-    })(null, null);
+    })(null, null, null);
 
     const pipelineStep = new CmsStructureModelMergerPipelineStep(factory);
     spyOn((pipelineStep as any).fsCmsPageMergerFactory, 'createFsCmsPageMerger' as any).and.callThrough();

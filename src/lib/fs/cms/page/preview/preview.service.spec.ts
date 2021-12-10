@@ -7,9 +7,10 @@ import { TestBed } from '@angular/core/testing';
 import { PreviewService } from './preview.service';
 import { PreviewTranslationService, PreviewTranslationKey as TranslationKey } from './preview-translation.service';
 import { TppWrapperService } from '../tpp-wrapper-service';
-import { ConfigModule } from '@spartacus/core';
+import { BaseSiteService, ConfigModule } from '@spartacus/core';
 import createSpy = jasmine.createSpy;
 import { FirstSpiritManagedPage } from 'fs-spartacus-common';
+import { MockBaseSiteService } from '../processing/merge/cms-structure-model-merger-factory.spec';
 
 describe('PreviewService', () => {
   beforeEach(async () => {
@@ -17,12 +18,16 @@ describe('PreviewService', () => {
       declarations: [],
       imports: [
         FsSpartacusBridgeModule.withConfig({
-          caas: { baseUrl: 'https://caas', project: 'project', apiKey: 'apiKey', tenantId: 'defaultTenant' },
-          firstSpiritManagedPages: [
-            FirstSpiritManagedPage.enhanceSapPages('OtherLandingPage2Template', [{ name: 'bottomheaderslot', mergeStrategy: REPLACE }]),
-            FirstSpiritManagedPage.enhanceSapPages('MyCustomOccTemplate', [{ name: 'bottomheaderslot', mergeStrategy: REPLACE }]),
-            FirstSpiritManagedPage.enhanceSapPages('LandingPage2Template', [{ name: 'bottomheaderslot', mergeStrategy: REPLACE }]),
-          ],
+          bridge: {
+            test: {
+              caas: { baseUrl: 'https://caas', project: 'project', apiKey: 'apiKey', tenantId: 'defaultTenant' },
+              firstSpiritManagedPages: [
+                FirstSpiritManagedPage.enhanceSapPages('OtherLandingPage2Template', [{ name: 'bottomheaderslot', mergeStrategy: REPLACE }]),
+                FirstSpiritManagedPage.enhanceSapPages('MyCustomOccTemplate', [{ name: 'bottomheaderslot', mergeStrategy: REPLACE }]),
+                FirstSpiritManagedPage.enhanceSapPages('LandingPage2Template', [{ name: 'bottomheaderslot', mergeStrategy: REPLACE }]),
+              ],
+            }
+          }
         }),
         ConfigModule.forRoot(),
       ],
@@ -53,6 +58,9 @@ describe('PreviewService', () => {
             showErrorDialog: (title$: Observable<string>, message$: Observable<string>) => Promise.resolve(),
           },
         },
+        {
+          provide: BaseSiteService, useClass: MockBaseSiteService
+        }
       ],
     }).compileComponents();
   });

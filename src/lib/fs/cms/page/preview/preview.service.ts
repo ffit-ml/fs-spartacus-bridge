@@ -5,8 +5,9 @@ import { Injectable } from '@angular/core';
 import { nullSafe, errorToString, FsSpartacusBridgeConfig } from 'fs-spartacus-common';
 import { FsEditingOverlay } from '../../../../fs-editing-overlay/fs-editing-overlay.component';
 import { getFsManagedPageConfigByTemplateId } from '../../../util/helper';
-import { PageType } from '@spartacus/core';
+import { BaseSiteService, PageType } from '@spartacus/core';
 import { CreatePageResult } from 'fs-tpp-api/snap';
+import { first } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +17,8 @@ export class PreviewService {
     private tppWrapperService: TppWrapperService,
     private previewTranslationService: PreviewTranslationService,
     private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig,
-    private previewDialogService: PreviewDialogService
+    private previewDialogService: PreviewDialogService,
+    private baseSiteService: BaseSiteService
   ) {}
 
   showDetailedErrorDialog(translationKey: TranslationKey, replacements?: { [key: string]: string }): void {
@@ -47,7 +49,11 @@ export class PreviewService {
 
   async createPage(pageUid: string, pageTemplate: string, pageType: PageType): Promise<CreatePageResult | undefined> {
     if (pageTemplate != null && pageUid != null && pageType != null) {
-      const fsPageConfig = getFsManagedPageConfigByTemplateId(this.fsSpartacusBridgeConfig.firstSpiritManagedPages, pageTemplate);
+      let baseSite;
+      this.baseSiteService.getActive().pipe(first()).subscribe(
+        activeBaseSite => baseSite = activeBaseSite
+      );
+      const fsPageConfig = getFsManagedPageConfigByTemplateId(this.fsSpartacusBridgeConfig.bridge[baseSite].firstSpiritManagedPages, pageTemplate);
       console.log(`Found the following configuration for the occ template id '${pageTemplate}': '${JSON.stringify(fsPageConfig)}'`);
       if (fsPageConfig != null) {
         const fsPageTypeMapping = await this.tppWrapperService.getFsPageTypeMapping(pageType, pageTemplate);

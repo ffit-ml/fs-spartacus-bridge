@@ -6,6 +6,7 @@ import { Append, APPEND, PREPEND, Prepend, Replace, REPLACE } from './merge/stra
 import { createFsEditingAreaInjectorPipelineStep } from './fs-editing-area/fs-editing-area-injector-pipeline-step';
 import { createFsEditingOverlayInjectorPipelineStep } from './fs-editing-overlay/fs-editing-overlay-injector-pipeline-step';
 import { FsSpartacusBridgeConfig } from 'fs-spartacus-common';
+import { BaseSiteService } from '@spartacus/core';
 
 @NgModule({
   providers: [
@@ -28,13 +29,13 @@ import { FsSpartacusBridgeConfig } from 'fs-spartacus-common';
     {
       provide: PREVIEW_PIPELINE_STEP,
       useFactory: createFsEditingAreaInjectorPipelineStep,
-      deps: [FsSpartacusBridgeConfig],
+      deps: [FsSpartacusBridgeConfig, BaseSiteService],
       multi: true,
     },
     {
       provide: PREVIEW_PIPELINE_STEP,
       useFactory: createFsEditingOverlayInjectorPipelineStep,
-      deps: [FsSpartacusBridgeConfig],
+      deps: [FsSpartacusBridgeConfig, BaseSiteService],
       multi: true,
     },
     {

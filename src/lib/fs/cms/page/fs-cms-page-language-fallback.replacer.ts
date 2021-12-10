@@ -1,8 +1,8 @@
 ﻿import { Injectable } from '@angular/core';
-import { Converter } from '@spartacus/core';
+import { BaseSiteService, Converter } from '@spartacus/core';
 import { FsSpartacusBridgeConfig } from 'fs-spartacus-common';
 import { Observable, of } from 'rxjs';
-import { map, switchAll, take } from 'rxjs/operators';
+import { first, map, switchAll, take } from 'rxjs/operators';
 import { CaasClient } from '../../caas/caas-client';
 import { CaasClientFactory } from '../../caas/caas-client.factory';
 
@@ -14,7 +14,11 @@ export class FsCmsPageLanguageFallbackReplacer implements Converter<FsCmsPageInt
   private identifier2ObjectMap: Map<string, any[]>;
   private fallbackLanguage: string;
 
-  constructor(private caasClientFactory: CaasClientFactory, private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig) {}
+  constructor(
+    private caasClientFactory: CaasClientFactory,
+    private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig,
+    private baseSiteService: BaseSiteService
+    ) {}
 
   convert(source: FsCmsPageInterface | null | undefined): Observable<FsCmsPageInterface> {
     // null is a valid value for source, because it indicates,
@@ -23,8 +27,12 @@ export class FsCmsPageLanguageFallbackReplacer implements Converter<FsCmsPageInt
       return of(null);
     }
 
-    if (this.fsSpartacusBridgeConfig.fallbackLanguage && this.fsSpartacusBridgeConfig.fallbackLanguage !== '') {
-      this.fallbackLanguage = this.fsSpartacusBridgeConfig.fallbackLanguage.substring(0, 2);
+    let baseSite;
+    this.baseSiteService.getActive().pipe(first()).subscribe(
+      activeBaseSite => baseSite = activeBaseSite
+    );
+    if (this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage && this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage !== '') {
+      this.fallbackLanguage = this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage.substring(0, 2);
     } else {
       // if no fallback language is configured in the bridge config return the source because no section can be replaced
       return of(source);

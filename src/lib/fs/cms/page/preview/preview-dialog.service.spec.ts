@@ -19,8 +19,12 @@ describe('PreviewDialogService', () => {
       imports: [
         RouterTestingModule,
         FsSpartacusBridgeModule.withConfig({
-          caas: { baseUrl: 'baseUrl', project: 'project', apiKey: 'apiKey', tenantId: 'defaultTenant' },
-          firstSpiritManagedPages: [],
+          bridge: {
+            test: {
+              caas: { baseUrl: 'baseUrl', project: 'project', apiKey: 'apiKey', tenantId: 'defaultTenant' },
+              firstSpiritManagedPages: [],
+            }
+          }
         }),
         ConfigModule.forRoot(),
       ],

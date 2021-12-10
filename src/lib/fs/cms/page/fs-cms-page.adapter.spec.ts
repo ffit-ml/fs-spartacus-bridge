@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { ConfigModule, LanguageService, PageContext, PageType } from '@spartacus/core';
+import { BaseSiteService, ConfigModule, LanguageService, PageContext, PageType } from '@spartacus/core';
 import { of, Subscription } from 'rxjs';
 
 import { FsSpartacusBridgeModule } from '../../../fs-spartacus-bridge.module';
@@ -10,6 +10,7 @@ import { caasFilterResult, fsCmsPageInterfaceJsonEn } from './fs-cms-page.adapte
 
 import createSpy = jasmine.createSpy;
 import Spy = jasmine.Spy;
+import { MockBaseSiteService } from './processing/merge/cms-structure-model-merger-factory.spec';
 
 class MockPreparer {
   convert = createSpy('Converter.convert').and.returnValue(of(fsCmsPageInterfaceJsonEn));
@@ -45,13 +46,17 @@ describe('FsCmsPageAdapter', () => {
     TestBed.configureTestingModule({
       imports: [
         FsSpartacusBridgeModule.withConfig({
-          caas: {
-            baseUrl: 'baseUrl',
-            project: 'project',
-            apiKey: 'apiKey',
-            tenantId: 'defaultTenant',
-          },
-          firstSpiritManagedPages: [],
+          bridge: {
+            test: {
+              caas: {
+                baseUrl: 'baseUrl',
+                project: 'project',
+                apiKey: 'apiKey',
+                tenantId: 'defaultTenant',
+              },
+              firstSpiritManagedPages: [],
+            }
+          }
         }),
         ConfigModule.forRoot(),
       ],
@@ -59,6 +64,7 @@ describe('FsCmsPageAdapter', () => {
         { provide: LanguageService, useFactory: languageServiceFactory('de') },
         { provide: CaasClientFactory, useFactory: caasClientFactory(caasClient) },
         { provide: FS_CMS_PAGE_PREPARER, useClass: MockPreparer, multi: true },
+        { provide: BaseSiteService, useClass: MockBaseSiteService }
       ],
     });
   });

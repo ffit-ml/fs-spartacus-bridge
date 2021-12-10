@@ -2,7 +2,15 @@ import { TppStatusService } from './tpp-status-service';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { CmsPageAdapter, CmsStructureConfigService, ConfigModule, LanguageService, PageType, TranslationService } from '@spartacus/core';
+import {
+  BaseSiteService,
+  CmsPageAdapter,
+  CmsStructureConfigService,
+  ConfigModule,
+  LanguageService,
+  PageType,
+  TranslationService
+} from '@spartacus/core';
 import { of } from 'rxjs';
 
 import { FsSpartacusBridgeModule } from '../../../fs-spartacus-bridge.module';
@@ -15,6 +23,7 @@ import { FsEditingOverlayComponent } from '../../../fs-editing-overlay/fs-editin
 import { FsEditingAreaComponent } from '../../../fs-editing-area/fs-editing-area.component';
 import { FirstSpiritManagedPage } from 'fs-spartacus-common';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MockBaseSiteService } from './processing/merge/cms-structure-model-merger-factory.spec';
 class MockOccCmsPageAdapter implements CmsPageAdapter {
   load = createSpy('OccCmsPageAdapter').and.returnValue(of(occCmsStructureModel));
 }
@@ -26,16 +35,20 @@ describe('All components in the FsCmsPageModule', () => {
         HttpClientTestingModule,
         RouterTestingModule,
         FsSpartacusBridgeModule.withConfig({
-          caas: { baseUrl: 'https://caas', project: 'project', apiKey: 'apiKey', tenantId: 'defaultTenant' },
-          firstSpiritManagedPages: [
-            FirstSpiritManagedPage.enhanceSapPages('LandingPage2Template', [
-              { name: 'stage_body', mergeStrategy: REPLACE },
-              { name: 'main_body', mergeStrategy: APPEND },
-              { name: 'tiles_body', mergeStrategy: REPLACE },
-              { name: 'main_navigation', mergeStrategy: APPEND },
-              { name: 'new_fs_content_slot', mergeStrategy: REPLACE },
-            ]),
-          ],
+          bridge: {
+            test: {
+              caas: { baseUrl: 'https://caas', project: 'project', apiKey: 'apiKey', tenantId: 'defaultTenant' },
+              firstSpiritManagedPages: [
+                FirstSpiritManagedPage.enhanceSapPages('LandingPage2Template', [
+                  { name: 'stage_body', mergeStrategy: REPLACE },
+                  { name: 'main_body', mergeStrategy: APPEND },
+                  { name: 'tiles_body', mergeStrategy: REPLACE },
+                  { name: 'main_navigation', mergeStrategy: APPEND },
+                  { name: 'new_fs_content_slot', mergeStrategy: REPLACE },
+                ]),
+              ],
+            }
+          }
         }),
         ConfigModule.forRoot(),
       ],
@@ -45,6 +58,7 @@ describe('All components in the FsCmsPageModule', () => {
         { provide: LanguageService, useValue: { getActive: () => of('de') } },
         { provide: CmsStructureConfigService, useValue: {} },
         { provide: TppStatusService, useValue: { isFirstSpiritPreview: () => of(false), onRerenderView: () => {} } },
+        { provide: BaseSiteService, useClass: MockBaseSiteService }
       ],
     });
   });

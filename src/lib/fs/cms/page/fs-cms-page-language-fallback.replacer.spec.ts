@@ -1,5 +1,5 @@
 ﻿import { TestBed } from '@angular/core/testing';
-import { ConfigModule } from '@spartacus/core';
+import { BaseSiteService, ConfigModule } from '@spartacus/core';
 import { copy } from 'fs-spartacus-common';
 import { of } from 'rxjs';
 import { FsSpartacusBridgeModule } from '../../../fs-spartacus-bridge.module';
@@ -14,6 +14,7 @@ import { FS_CMS_PAGE_LANGUAGE_FALLBACK_REPLACER } from './fs-cms-page.converter'
 
 import createSpy = jasmine.createSpy;
 import Spy = jasmine.Spy;
+import { MockBaseSiteService } from './processing/merge/cms-structure-model-merger-factory.spec';
 
 const testDataA = copy(sourcePageDataWithFallbacks);
 const testDataB = copy(sourcePageDataWithoutFallbacks);
@@ -43,18 +44,25 @@ describe('FsCmsPageLanguageFallbackReplacer', () => {
     TestBed.configureTestingModule({
       imports: [
         FsSpartacusBridgeModule.withConfig({
-          fallbackLanguage: 'en_GB',
-          caas: {
-            baseUrl: 'baseUrl',
-            project: 'project',
-            apiKey: 'apiKey',
-            tenantId: 'defaultTenant',
-          },
-          firstSpiritManagedPages: [],
+          bridge: {
+            test: {
+              fallbackLanguage: 'en_GB',
+              caas: {
+                baseUrl: 'baseUrl',
+                project: 'project',
+                apiKey: 'apiKey',
+                tenantId: 'defaultTenant',
+              },
+              firstSpiritManagedPages: [],
+            }
+          }
         }),
         ConfigModule.forRoot(),
       ],
-      providers: [{ provide: CaasClientFactory, useFactory: caasClientFactory(caasClient) }],
+      providers: [
+        { provide: CaasClientFactory, useFactory: caasClientFactory(caasClient) },
+        { provide: BaseSiteService, useClass: MockBaseSiteService }
+      ],
     });
   });
 
@@ -102,17 +110,24 @@ describe('FsCmsPageLanguageFallbackReplacer', () => {
     TestBed.configureTestingModule({
       imports: [
         FsSpartacusBridgeModule.withConfig({
-          caas: {
-            baseUrl: 'baseUrl',
-            project: 'project',
-            apiKey: 'apiKey',
-            tenantId: 'defaultTenant',
-          },
-          firstSpiritManagedPages: [],
+          bridge: {
+            test: {
+              caas: {
+                baseUrl: 'baseUrl',
+                project: 'project',
+                apiKey: 'apiKey',
+                tenantId: 'defaultTenant',
+              },
+              firstSpiritManagedPages: [],
+            }
+          }
         }),
         ConfigModule.forRoot(),
       ],
-      providers: [{ provide: CaasClientFactory, useFactory: caasClientFactory(caasClient) }],
+      providers: [
+        { provide: CaasClientFactory, useFactory: caasClientFactory(caasClient) },
+        { provide: BaseSiteService, useClass: MockBaseSiteService }
+      ],
     });
 
     const converters = TestBed.inject(FS_CMS_PAGE_LANGUAGE_FALLBACK_REPLACER);

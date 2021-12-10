@@ -13,13 +13,17 @@ describe('CmsStructureModelResponseFactory', () => {
       imports: [
         HttpClientTestingModule,
         FsSpartacusBridgeModule.withConfig({
-          caas: {
-            baseUrl: '',
-            project: '',
-            apiKey: '',
-            tenantId: '',
-          },
-          firstSpiritManagedPages: [FirstSpiritManagedPage.integrateFsDrivenPages('FirstSpiritDrivenPage', [])],
+          bridge: {
+            test: {
+              caas: {
+                baseUrl: '',
+                project: '',
+                apiKey: '',
+                tenantId: '',
+              },
+              firstSpiritManagedPages: [FirstSpiritManagedPage.integrateFsDrivenPages('FirstSpiritDrivenPage', [])],
+            }
+          }
         }),
         ConfigModule.forRoot(),
       ],

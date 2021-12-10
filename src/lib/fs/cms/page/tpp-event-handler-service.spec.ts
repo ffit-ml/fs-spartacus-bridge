@@ -6,7 +6,7 @@ import { TppEventHandlerService } from './tpp-event-handler-service';
 import { Status } from 'fs-tpp-api/snap';
 import { TppWrapperService } from './tpp-wrapper-service';
 import { TestBed } from '@angular/core/testing';
-import { ConfigModule, LanguageService, TranslationService } from '@spartacus/core';
+import { BaseSiteService, ConfigModule, LanguageService, TranslationService } from '@spartacus/core';
 import { of } from 'rxjs';
 
 import { FsSpartacusBridgeModule } from '../../../fs-spartacus-bridge.module';
@@ -15,6 +15,7 @@ import { Inject, Injectable, NgZone, PLATFORM_ID } from '@angular/core';
 
 import createSpy = jasmine.createSpy;
 import Spy = jasmine.Spy;
+import { MockBaseSiteService } from './processing/merge/cms-structure-model-merger-factory.spec';
 
 const DEFAULT_UID = 'uid-123';
 const DEFAULT_PAGE_NAME = 'TestPage';
@@ -142,13 +143,17 @@ describe('TppEventHandlerService', () => {
       imports: [
         RouterTestingModule,
         FsSpartacusBridgeModule.withConfig({
-          caas: {
-            baseUrl: 'baseUrl',
-            project: 'project',
-            apiKey: 'apiKey',
-            tenantId: 'defaultTenant',
-          },
-          firstSpiritManagedPages: [],
+          bridge: {
+            test: {
+              caas: {
+                baseUrl: 'baseUrl',
+                project: 'project',
+                apiKey: 'apiKey',
+                tenantId: 'defaultTenant',
+              },
+              firstSpiritManagedPages: [],
+            }
+          }
         }),
         ConfigModule.forRoot(),
       ],
@@ -160,6 +165,7 @@ describe('TppEventHandlerService', () => {
         { provide: PreviewPageService, useClass: MockPreviewPageService },
         { provide: TranslationService, useValue: {} },
         { provide: NgZone, useClass: MockNgZone },
+        { provide: BaseSiteService, useClass: MockBaseSiteService }
       ],
     });
   });

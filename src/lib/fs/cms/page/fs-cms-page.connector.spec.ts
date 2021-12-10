@@ -16,7 +16,7 @@ import {
   PageContext,
   PageType,
   LanguageService,
-  TranslationService,
+  TranslationService, BaseSiteService,
 } from '@spartacus/core';
 import { of, throwError, isObservable, Observable } from 'rxjs';
 
@@ -30,6 +30,7 @@ import { FsCmsPageAdaptersFacade } from './fs-cms-page-adapters-facade';
 import { FirstSpiritManagedPage } from 'fs-spartacus-common';
 import { FsDrivenPageService } from './fs-driven-page-service';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MockBaseSiteService } from './processing/merge/cms-structure-model-merger-factory.spec';
 
 class MockCmsPageAdapter implements CmsPageAdapter {
   constructor(
@@ -66,22 +67,26 @@ describe('FsCmsPageConnector', () => {
         HttpClientTestingModule,
         RouterTestingModule,
         FsSpartacusBridgeModule.withConfig({
-          caas: {
-            baseUrl: '',
-            project: '',
-            apiKey: '',
-            tenantId: '',
-          },
-          firstSpiritManagedPages: [
-            FirstSpiritManagedPage.enhanceSapPages('LandingPage2Template', []),
-            FirstSpiritManagedPage.integrateFsDrivenPages('FsDrivenPageTemplate', []),
-            FirstSpiritManagedPage.integrateFsDrivenPagesIntoSapSkeleton(
-              'homepage',
-              PageType.CONTENT_PAGE,
-              'FsDrivenLandingPage2Template',
-              []
-            ),
-          ],
+          bridge: {
+            test: {
+              caas: {
+                baseUrl: '',
+                project: '',
+                apiKey: '',
+                tenantId: '',
+              },
+              firstSpiritManagedPages: [
+                FirstSpiritManagedPage.enhanceSapPages('LandingPage2Template', []),
+                FirstSpiritManagedPage.integrateFsDrivenPages('FsDrivenPageTemplate', []),
+                FirstSpiritManagedPage.integrateFsDrivenPagesIntoSapSkeleton(
+                  'homepage',
+                  PageType.CONTENT_PAGE,
+                  'FsDrivenLandingPage2Template',
+                  []
+                ),
+              ],
+            }
+          }
         }),
         ConfigModule.forRoot(),
       ],
@@ -93,6 +98,7 @@ describe('FsCmsPageConnector', () => {
         { provide: CmsStructureConfigService, useValue: {} },
         { provide: PipelineFactory, useValue: new MockPipelineFactory(pipeline) },
         { provide: TppStatusService, useValue: {} },
+        { provide: BaseSiteService, useValue: MockBaseSiteService },
       ],
     });
 
