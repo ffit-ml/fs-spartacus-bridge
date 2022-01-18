@@ -3,7 +3,6 @@ import { PreviewTranslationKey } from './preview/preview-translation.service';
 import { PreviewService } from './preview/preview.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { TppEventHandlerService } from './tpp-event-handler-service';
-import { Status } from 'fs-tpp-api/snap';
 import { TppWrapperService } from './tpp-wrapper-service';
 import { TestBed } from '@angular/core/testing';
 import { BaseSiteService, ConfigModule, LanguageService, TranslationService } from '@spartacus/core';
@@ -11,8 +10,9 @@ import { of } from 'rxjs';
 
 import { FsSpartacusBridgeModule } from '../../../fs-spartacus-bridge.module';
 import { CaasClientFactory } from '../../caas/caas-client.factory';
-import { Inject, Injectable, NgZone, PLATFORM_ID } from '@angular/core';
-
+import { Injectable, NgZone } from '@angular/core';
+import { TppLoaderService } from './tpp-loader.service';
+import { SNAP, Status } from './fs-tpp-api.data';
 import createSpy = jasmine.createSpy;
 import Spy = jasmine.Spy;
 import { MockBaseSiteService } from './processing/merge/cms-structure-model-merger-factory.spec';
@@ -38,9 +38,9 @@ class MockTppWrapperService extends TppWrapperService {
       displayName: DEFAULT_PAGE_NAME,
       name: DEFAULT_PAGE_NAME,
     },
-    @Inject(PLATFORM_ID) platformId?: string
+    tppLoaderService: TppLoaderService
   ) {
-    super(platformId);
+    super(tppLoaderService)
   }
   onRequestPreviewElementHandler: (previewId: string) => void;
 
@@ -76,6 +76,15 @@ class MockTppWrapperService extends TppWrapperService {
 
   async renderElement(previewId: string): Promise<any> {
     return Promise.resolve<any>({});
+  }
+}
+
+class MockTppLoaderService extends TppLoaderService{
+  constructor() {
+    super('test');
+  }
+  async getSnap(): Promise<SNAP> | null {
+    return null
   }
 }
 
@@ -160,7 +169,10 @@ describe('TppEventHandlerService', () => {
       providers: [
         { provide: LanguageService, useFactory: languageServiceFactory('en') },
         { provide: CaasClientFactory, useFactory: caasClientFactory(caasClient) },
-        { provide: TppWrapperService, useValue: new MockTppWrapperService(DEFAULT_UID) },
+        {
+          provide: TppWrapperService, useValue:
+            new MockTppWrapperService(DEFAULT_UID, undefined, new MockTppLoaderService())
+        },
         { provide: PreviewService, useClass: MockPreviewService },
         { provide: PreviewPageService, useClass: MockPreviewPageService },
         { provide: TranslationService, useValue: {} },
@@ -188,7 +200,9 @@ describe('TppEventHandlerService', () => {
 
   it('should navigate to a page that was requested via report', async () => {
     TestBed.overrideProvider(TppWrapperService, {
-      useValue: new MockTppWrapperService(`ContentPage:${DEFAULT_UID}`),
+      useValue: new MockTppWrapperService(
+        `ContentPage:${DEFAULT_UID}`, undefined, new MockTppLoaderService()
+      ),
     });
     const tppEventHandler = TestBed.inject(TppEventHandlerService);
     spyOn(tppEventHandler as any, 'fetchPageFromCaas').and.returnValue({ uid: DEFAULT_UID });
@@ -241,7 +255,7 @@ describe('TppEventHandlerService', () => {
 
   it('should display an error message if no element status is available for the given preview id', async () => {
     TestBed.overrideProvider(TppWrapperService, {
-      useValue: new MockTppWrapperService(DEFAULT_UID, null),
+      useValue: new MockTppWrapperService(DEFAULT_UID, null, new MockTppLoaderService()),
     });
     const tppEventHandler = TestBed.inject(TppEventHandlerService);
     spyOn(tppEventHandler as any, 'fetchPageFromCaas').and.returnValue({ uid: DEFAULT_UID });
@@ -262,7 +276,7 @@ describe('TppEventHandlerService', () => {
 
   it('should display an error message if the getHybrisPageId result is null', async () => {
     TestBed.overrideProvider(TppWrapperService, {
-      useValue: new MockTppWrapperService(null),
+      useValue: new MockTppWrapperService(null, undefined, new MockTppLoaderService()),
     });
     const tppEventHandler = TestBed.inject(TppEventHandlerService);
     spyOn(tppEventHandler as any, 'fetchPageFromCaas').and.returnValue({ uid: DEFAULT_UID });

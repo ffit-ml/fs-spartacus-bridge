@@ -6,7 +6,7 @@ import { nullSafe, errorToString, FsSpartacusBridgeConfig } from 'fs-spartacus-c
 import { FsEditingOverlay } from '../../../../fs-editing-overlay/fs-editing-overlay.component';
 import { getFsManagedPageConfigByTemplateId } from '../../../util/helper';
 import { BaseSiteService, PageType } from '@spartacus/core';
-import { CreatePageResult } from 'fs-tpp-api/snap';
+import { CreatePageResult } from '../fs-tpp-api.data';
 import { first } from 'rxjs/operators';
 
 @Injectable({

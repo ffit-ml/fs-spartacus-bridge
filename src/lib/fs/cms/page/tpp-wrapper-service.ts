@@ -1,13 +1,13 @@
-import {
-  CreateSectionOptions,
-  CreatePageOptions,
-  CreatePageResult,
-  CreateSectionResult,
-  Status, SNAP
-} from 'fs-tpp-api/snap';
-import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { FsCmsPageInterface } from './fs-cms-page.interface';
-import { isPlatformBrowser } from '@angular/common';
+import { TppLoaderService } from './tpp-loader.service';
+import {
+  CreatePageOptions, CreatePageResult,
+  CreateSectionOptions,
+  CreateSectionResult,
+  SNAP,
+  Status
+} from './fs-tpp-api.data';
 
 export interface PageTypeMappingResult {
   fsTemplate: string;
@@ -19,11 +19,13 @@ export interface PageTypeMappingResult {
   providedIn: 'root',
 })
 export class TppWrapperService {
-  private TPP_SNAP: SNAP = isPlatformBrowser(this.platformId) ? require('fs-tpp-api/snap') : null;
+  private TPP_SNAP: SNAP;
 
   constructor(
-    @Inject(PLATFORM_ID) private platformId: string
-  ) {}
+    private tppLoaderService: TppLoaderService
+  ) {
+    this.tppLoaderService.getSnap()?.then(snap => this.TPP_SNAP = snap);
+  }
 
   async getFsPageTypeMapping(pageType: string, pageTemplate: string): Promise<PageTypeMappingResult | undefined> {
     console.log(`Execute the script 'page_type_mapping' with the parameters pageType = '${pageType}' and pageTemplate = '${pageTemplate}'`);

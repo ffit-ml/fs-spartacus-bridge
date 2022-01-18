@@ -4,7 +4,7 @@
     "outDir": "./../out-tsc/lib"
   },
   "files": ["./public-api.ts", "./types.ts", "./typings.d.ts"],
-  "include": ["lib/**/*.ts"],
+  "include": ["lib/**/*.ts", "lib/fs/cms/page/tpp-loader.js"],
   "exclude": [
     "**/test.ts",
     "**/*.spec.ts",

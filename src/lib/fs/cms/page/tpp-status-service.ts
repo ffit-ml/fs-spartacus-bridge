@@ -1,50 +1,55 @@
 import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
-import { Inject, Injectable, NgZone, OnDestroy, PLATFORM_ID, RendererFactory2 } from '@angular/core';
+import { Inject, Injectable, NgZone, OnDestroy, RendererFactory2 } from '@angular/core';
 import { CmsService, Page } from '@spartacus/core';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { NavigationMessageHandlerService } from './navigation-message-handler.service';
-import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { SNAP } from 'fs-tpp-api/snap';
+import { DOCUMENT } from '@angular/common';
+import { TppLoaderService } from './tpp-loader.service';
+import { SNAP } from './fs-tpp-api.data';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TppStatusService implements OnDestroy {
-  private readonly firstSpiritPreview: Observable<boolean>;
+  private firstSpiritPreview: Observable<boolean>;
   private subs$ = new Subscription();
-  private TPP_SNAP: SNAP = isPlatformBrowser(this.platformId) ? require('fs-tpp-api/snap') : null;
+  private TPP_SNAP: SNAP;
 
   constructor(
     private cmsService: CmsService,
     private ngZone: NgZone,
     private navigationMessageHandlerService: NavigationMessageHandlerService,
     private rendererFactory: RendererFactory2,
+    private tppLoaderService: TppLoaderService,
     @Inject(DOCUMENT) private document,
-    @Inject(PLATFORM_ID) private platformId: string
   ) {
     const isConnected = new BehaviorSubject(false);
     const renderer = this.rendererFactory.createRenderer(null, null);
-    if (isPlatformBrowser(platformId)) {
-      this.TPP_SNAP.onInit((success: boolean) => this.ngZone.run(() => isConnected.next(success)));
-    }
-    else {
-      isConnected.next(false);
-    }
     this.firstSpiritPreview = isConnected.pipe(distinctUntilChanged());
-    this.subs$.add(this.firstSpiritPreview.subscribe(async (isFirstSpiritPreview) => {
-      if (isFirstSpiritPreview) {
-        renderer.setAttribute(this.document.body, 'dnd-orient', 'horizontal');
-        this.overrideTranslateButton();
-        this.adjustCreateComponentPosition();
-        this.navigationMessageHandlerService.initialize();
-      } else {
-        renderer.removeAttribute(this.document.body, 'dnd-orient');
-        this.navigationMessageHandlerService.destroy();
-      }
-    }));
+    this.tppLoaderService.getSnap()?.then(snap => {
+      this.TPP_SNAP = snap;
 
-    combineLatest([this.firstSpiritPreview, this.cmsService.getCurrentPage()]).subscribe(async (params) => {
-      await this.setPagePreviewElementInPreview(...params);
+      if (this.TPP_SNAP) {
+        this.TPP_SNAP.onInit((success: boolean) => this.ngZone.run(() => isConnected.next(success)));
+      }
+      else {
+        isConnected.next(false);
+      }
+      this.subs$.add(this.firstSpiritPreview.subscribe(async (isFirstSpiritPreview) => {
+        if (isFirstSpiritPreview) {
+          renderer.setAttribute(this.document.body, 'dnd-orient', 'horizontal');
+          this.overrideTranslateButton();
+          this.adjustCreateComponentPosition();
+          this.navigationMessageHandlerService.initialize();
+        } else {
+          renderer.removeAttribute(this.document.body, 'dnd-orient');
+          this.navigationMessageHandlerService.destroy();
+        }
+      }));
+
+      combineLatest([this.firstSpiritPreview, this.cmsService.getCurrentPage()]).subscribe(async (params) => {
+        await this.setPagePreviewElementInPreview(...params);
+      });
     });
   }
 

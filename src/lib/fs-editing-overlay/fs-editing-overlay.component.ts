@@ -8,7 +8,7 @@ import { TppWrapperService } from '../fs/cms/page/tpp-wrapper-service';
 import { nullSafe, errorToString } from 'fs-spartacus-common';
 import { PreviewService } from '../fs/cms/page/preview/preview.service';
 import { extractPageUniqueId } from '../fs/util/occ-cms-pages';
-import { CreatePageResult } from 'fs-tpp-api/snap';
+import { CreatePageResult } from '../fs/cms/page/fs-tpp-api.data';
 
 @Component({
   selector: 'fs-fs-editing-overlay',
