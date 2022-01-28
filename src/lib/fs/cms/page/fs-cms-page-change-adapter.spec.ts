@@ -76,7 +76,7 @@ class MockTppWrapperService extends TppWrapperService {
     return of(false);
   }
 
-  onRerenderView(handler: RerenderHandler) {
+  async onRerenderView(handler: RerenderHandler) {
     this.rerenderHandlers.push(handler);
   }
 

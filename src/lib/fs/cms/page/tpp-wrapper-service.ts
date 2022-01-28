@@ -5,7 +5,6 @@ import {
   CreatePageOptions, CreatePageResult,
   CreateSectionOptions,
   CreateSectionResult,
-  SNAP,
   Status
 } from './fs-tpp-api.data';
 
@@ -19,13 +18,11 @@ export interface PageTypeMappingResult {
   providedIn: 'root',
 })
 export class TppWrapperService {
-  private TPP_SNAP: SNAP;
+  private TPP_SNAP = this.tppLoaderService.getSnap();
 
   constructor(
     private tppLoaderService: TppLoaderService
-  ) {
-    this.tppLoaderService.getSnap()?.then(snap => this.TPP_SNAP = snap);
-  }
+  ) {}
 
   async getFsPageTypeMapping(pageType: string, pageTemplate: string): Promise<PageTypeMappingResult | undefined> {
     console.log(`Execute the script 'page_type_mapping' with the parameters pageType = '${pageType}' and pageTemplate = '${pageTemplate}'`);
@@ -40,7 +37,8 @@ export class TppWrapperService {
   }
 
   async setPreviewElement(previewId: string): Promise<void> {
-    await this.TPP_SNAP?.setPreviewElement(previewId || null); // It is important to pass null (instead of undefined), if there is no preview id!
+    const snap = await this.TPP_SNAP;
+    await snap?.setPreviewElement(previewId || null); // It is important to pass null (instead of undefined), if there is no preview id!
   }
 
   async getHybrisPageId(pageRefUid: string): Promise<string> {
@@ -64,41 +62,51 @@ export class TppWrapperService {
   }
 
   async getElementStatus(previewId: string): Promise<Status> {
-    return this.TPP_SNAP?.getElementStatus(previewId);
+    const snap = await this.TPP_SNAP;
+    return snap?.getElementStatus(previewId);
   }
 
   async getPreviewElement(): Promise<string> {
-    return this.TPP_SNAP?.getPreviewElement();
+    const snap = await this.TPP_SNAP;
+    return snap?.getPreviewElement();
   }
 
-  createSection(previewId: string, options?: CreateSectionOptions): Promise<CreateSectionResult> | void {
-    return this.TPP_SNAP?.createSection(previewId, options);
+  async createSection(previewId: string, options?: CreateSectionOptions): Promise<CreateSectionResult | void> {
+    const snap = await this.TPP_SNAP;
+    return snap?.createSection(previewId, options);
   }
 
-  createPage(path: string, uid: string, template: string, options?: CreatePageOptions): Promise<CreatePageResult> | void {
-    return this.TPP_SNAP?.createPage(path, uid, template, options);
+  async createPage(path: string, uid: string, template: string, options?: CreatePageOptions): Promise<CreatePageResult | void> {
+    const snap = await this.TPP_SNAP;
+    return snap?.createPage(path, uid, template, options);
   }
 
-  onRerenderView(handler: () => void): void {
-    this.TPP_SNAP?.onRerenderView(handler);
+  async onRerenderView(handler: () => void): Promise<void> {
+    const snap = await this.TPP_SNAP;
+    snap.onRerenderView(handler);
   }
 
-  onRequestPreviewElement(handler: (previewId: string) => void): void {
-    this.TPP_SNAP?.onRequestPreviewElement(handler);
+  async onRequestPreviewElement(handler: (previewId: string) => void): Promise<void> {
+    const snap = await this.TPP_SNAP;
+    await snap?.onRequestPreviewElement(handler);
   }
 
   async triggerRerenderView(): Promise<void> {
-    return this.TPP_SNAP?.triggerRerenderView();
+    const snap = await this.TPP_SNAP;
+    return snap?.triggerRerenderView();
   }
 
   async renderElement(previewId: string): Promise<FsCmsPageInterface> {
-    return this.TPP_SNAP?.renderElement(previewId) as Promise<FsCmsPageInterface>;
+    const snap = await this.TPP_SNAP;
+    return snap?.renderElement(previewId) as Promise<FsCmsPageInterface>;
   }
 
   async execute(identifier: string, params: object, result?: boolean): Promise<any> {
-    return this.TPP_SNAP?.execute(identifier, params, result);
+    const snap = await this.TPP_SNAP;
+    return snap?.execute(identifier, params, result);
   }
-  showEditDialog(previewId: string) {
-    return this.TPP_SNAP?.showEditDialog(previewId);
+  async showEditDialog(previewId: string) {
+    const snap = await this.TPP_SNAP;
+    return snap?.showEditDialog(previewId);
   }
 }
