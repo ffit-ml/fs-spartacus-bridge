@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Converter } from '@spartacus/core';
+import { BaseSiteService, Converter } from '@spartacus/core';
 
 import { FsCmsPageInterface, FormData, Value } from './fs-cms-page.interface';
-import { map, filter, take, switchAll } from 'rxjs/operators';
+import { map, filter, take, switchAll, first } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { CaasClientFactory } from '../../caas/caas-client.factory';
 import { CaasClient } from '../../caas/caas-client';
@@ -15,7 +15,11 @@ export class FsCmsPagePreparer implements Converter<FsCmsPageInterface, Observab
   private identifier2ObjectMap: Map<string, any[]>;
   private identifier2FallbackObjectMap: Map<string, any[]>;
   private fallbackLocale: string;
-  constructor(private caasClientFactory: CaasClientFactory, private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig) {}
+  constructor(
+    private caasClientFactory: CaasClientFactory,
+    private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig,
+    private baseSiteService: BaseSiteService,
+  ) {}
 
   convert(source: FsCmsPageInterface | null | undefined): Observable<FsCmsPageInterface> {
     // null is a valid value for source, because it indicates,
@@ -24,8 +28,12 @@ export class FsCmsPagePreparer implements Converter<FsCmsPageInterface, Observab
       return of(null);
     }
 
-    if (this.fsSpartacusBridgeConfig.fallbackLanguage && this.fsSpartacusBridgeConfig.fallbackLanguage !== '') {
-      this.fallbackLocale = this.fsSpartacusBridgeConfig.fallbackLanguage;
+    let baseSite;
+    this.baseSiteService.getActive().pipe(first()).subscribe(
+      activeBaseSite => baseSite = activeBaseSite
+    );
+    if (this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage && this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage !== '') {
+      this.fallbackLocale = this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage;
     }
 
     const caasClientFactoryObservable = this.caasClientFactory.createCaasClient().pipe(take(1));
@@ -184,25 +192,39 @@ export class FsCmsPagePreparer implements Converter<FsCmsPageInterface, Observab
     Object.values(formData || {}).forEach((inputComponent) => {
       if (inputComponent.value && typeof inputComponent.value === 'object') {
         if (!Array.isArray(inputComponent.value)) {
-          this.collectDatasetInputComponents(inputComponent.value, addIdentifier2Map);
+          this.deepSearchForDatasetInputComponents(inputComponent.value, addIdentifier2Map);
         } else {
           inputComponent.value.forEach((element) => {
-            this.collectDatasetInputComponents(element, addIdentifier2Map);
+            this.deepSearchForDatasetInputComponents(element, addIdentifier2Map);
           });
         }
       }
     });
   }
 
-  private collectDatasetInputComponents(element: Value, addIdentifier2Map: (identifier: string, content: any) => void) {
-    if (element.fsType && element.fsType === 'Record') {
+  private deepSearchForDatasetInputComponents(element: Value, addIdentifier2Map: (identifier: string, content: any) => void) {
+    const shouldTerminate = this.collectDatasetInputComponents(element, addIdentifier2Map)
+    if (!shouldTerminate && typeof element === 'object') {
+      Object.values(element).forEach((elementChild: Value) => {
+        if(elementChild) {
+          this.deepSearchForDatasetInputComponents(elementChild, addIdentifier2Map);
+        }
+      })
+    }
+  }
+
+  private collectDatasetInputComponents(element: Value, addIdentifier2Map: (identifier: string, content: any) => void): boolean {
+    if (element.fsType && element.fsType === 'Record' && element.value) {
       addIdentifier2Map(element.value.target.identifier, element.value.target);
+      return true;
     } else if (element.fsType && element.fsType === 'DatasetReference') {
       addIdentifier2Map(element.target.identifier, element.target);
+      return true;
     } else if (element.formData) {
-      this.collectDatasetInputComponents(element.formData, addIdentifier2Map);
+      return this.collectDatasetInputComponents(element.formData, addIdentifier2Map);
     } else if (element.value && element.value.formData) {
-      this.collectDatasetInputComponents(element.value.formData, addIdentifier2Map);
+      return this.collectDatasetInputComponents(element.value.formData, addIdentifier2Map);
     }
+    return false;
   }
 }

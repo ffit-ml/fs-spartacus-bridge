@@ -1,12 +1,19 @@
 ﻿import { occResponse, fsCmsPageWithSapSkeleton, fsDrivenCmsPage } from './fs-driven-page-service.spec.data';
 import { FsDrivenPageService } from './fs-driven-page-service';
 import { TestBed } from '@angular/core/testing';
-import { ConfigModule, PageType, CmsStructureModel, CmsPageAdapter, PageContext } from '@spartacus/core';
+import {
+  ConfigModule,
+  PageType,
+  CmsStructureModel,
+  CmsPageAdapter,
+  PageContext, BaseSiteService
+} from '@spartacus/core';
 import { FsSpartacusBridgeModule } from '../../../fs-spartacus-bridge.module';
 import { FirstSpiritManagedPage, copy } from 'fs-spartacus-common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { LayoutConfig } from '@spartacus/storefront';
 import { of, Observable } from 'rxjs';
+import { MockBaseSiteService } from './processing/merge/cms-structure-model-merger-factory.spec';
 
 class MockFsCmsPageAdapter extends CmsPageAdapter {
   constructor(private loadResult: any) {
@@ -32,22 +39,26 @@ describe('FsDrivenPageService', () => {
       imports: [
         HttpClientTestingModule,
         FsSpartacusBridgeModule.withConfig({
-          caas: {
-            baseUrl: '',
-            project: '',
-            apiKey: '',
-            tenantId: '',
-          },
-          firstSpiritManagedPages: [
-            FirstSpiritManagedPage.enhanceSapPages('LandingPage2Template', []),
-            FirstSpiritManagedPage.integrateFsDrivenPages('FsDrivenPageTemplate', []),
-            FirstSpiritManagedPage.integrateFsDrivenPagesIntoSapSkeleton(
-              'homepage',
-              PageType.CONTENT_PAGE,
-              'FsDrivenLandingPage2Template',
-              []
-            ),
-          ],
+          bridge: {
+            test: {
+              caas: {
+                baseUrl: '',
+                project: '',
+                apiKey: '',
+                tenantId: '',
+              },
+              firstSpiritManagedPages: [
+                FirstSpiritManagedPage.enhanceSapPages('LandingPage2Template', []),
+                FirstSpiritManagedPage.integrateFsDrivenPages('FsDrivenPageTemplate', []),
+                FirstSpiritManagedPage.integrateFsDrivenPagesIntoSapSkeleton(
+                  'homepage',
+                  PageType.CONTENT_PAGE,
+                  'FsDrivenLandingPage2Template',
+                  []
+                ),
+              ],
+            }
+          }
         }),
         ConfigModule.forRoot(),
       ],
@@ -60,6 +71,10 @@ describe('FsDrivenPageService', () => {
             },
           },
         },
+        {
+          provide: BaseSiteService,
+          useClass: MockBaseSiteService
+        }
       ],
     });
 

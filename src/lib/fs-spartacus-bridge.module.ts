@@ -31,6 +31,21 @@ import { CountryProvider } from '../types'
     PageComponentModule,
     OutletModule,
   ],
+  providers: [
+    {
+      provide: HttpErrorHandler,
+      useClass: CaasForbiddenHandler,
+      multi: true,
+    },
+    {
+      provide: HttpErrorHandler,
+      useClass: CaasUnauthorizedHandler,
+      multi: true,
+    },
+    provideConfig({
+      i18n: { resources: translations },
+    }),
+  ],
   exports: [FsEditingOverlayComponent, FsEditingAreaComponent],
   entryComponents: [FsEditingOverlayComponent, FsEditingAreaComponent],
 })
@@ -41,19 +56,6 @@ export class FsSpartacusBridgeModule {
       providers: [
         { provide: FsSpartacusBridgeConfig, useExisting: Config },
         provideConfig(config),
-        {
-          provide: HttpErrorHandler,
-          useClass: CaasForbiddenHandler,
-          multi: true,
-        },
-        {
-          provide: HttpErrorHandler,
-          useClass: CaasUnauthorizedHandler,
-          multi: true,
-        },
-        provideConfig({
-          i18n: { resources: translations },
-        }),
       ],
     }
     if (countryProvider) {

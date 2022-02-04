@@ -6,6 +6,8 @@ import { FsEditingOverlayInjectorPipelineStep } from './fs-editing-overlay/fs-ed
 import { CmsStructureModelMergerPipelineStep } from './merge/cms-structure-model-merger-pipeline-step';
 import { FsEditingAreaInjectorPipelineStep } from './fs-editing-area/fs-editing-area-injector-pipeline-step';
 import { FsSpartacusBridgeConfig } from 'fs-spartacus-common';
+import { BaseSiteService } from '@spartacus/core';
+import { MockBaseSiteService } from './merge/cms-structure-model-merger-factory.spec';
 
 describe('FsCmsPageProcessingModule', () => {
   beforeEach(() => {
@@ -19,6 +21,9 @@ describe('FsCmsPageProcessingModule', () => {
             firstSpiritManagedPages: [],
           } as FsSpartacusBridgeConfig,
         },
+        {
+          provide: BaseSiteService, useClass: MockBaseSiteService
+        }
       ],
     });
   });

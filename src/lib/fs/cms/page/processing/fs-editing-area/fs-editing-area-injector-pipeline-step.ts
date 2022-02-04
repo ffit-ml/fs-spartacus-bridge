@@ -1,17 +1,22 @@
 import { PipelineStep } from '../pipeline-step';
-import { CmsStructureModel, ContentSlotData } from '@spartacus/core';
+import { BaseSiteService, CmsStructureModel, ContentSlotData } from '@spartacus/core';
 import { getSlotIgnoreCase } from '../../../../util/content-slots';
 import { Injectable } from '@angular/core';
 import { FsCmsPageComponentInjector } from '../fs-cms-page-component-injector';
 import { FsEditingAreaComponent } from '../../../../../fs-editing-area/fs-editing-area.component';
 import { getFsManagedPageConfigByTemplateId } from '../../../../util/helper';
 import { FsSpartacusBridgeConfig, Optional } from 'fs-spartacus-common';
+import { first } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FsEditingAreaInjectorPipelineStep implements PipelineStep {
-  constructor(private fsComponentInjector: FsCmsPageComponentInjector, private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig) {}
+  constructor(
+    private fsComponentInjector: FsCmsPageComponentInjector,
+    private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig,
+    private baseSiteService: BaseSiteService
+    ) {}
 
   execute(occCmsStructureModel: CmsStructureModel, fsCmsStructureModel: CmsStructureModel): CmsStructureModel {
     return this.addFsEditingAreasToOccCmsPage(occCmsStructureModel, fsCmsStructureModel);
@@ -42,8 +47,12 @@ export class FsEditingAreaInjectorPipelineStep implements PipelineStep {
   }
 
   private findFirstSpiritManagedPage(occCmsPage: CmsStructureModel, fsCmsPage: CmsStructureModel) {
+    let baseSite;
+    this.baseSiteService.getActive().pipe(first()).subscribe(
+      activeBaseSite => baseSite = activeBaseSite
+    );
     return getFsManagedPageConfigByTemplateId(
-      this.fsSpartacusBridgeConfig.firstSpiritManagedPages,
+      this.fsSpartacusBridgeConfig.bridge[baseSite].firstSpiritManagedPages,
       this.tryGetPageTemplate(occCmsPage) || this.tryGetPageTemplate(fsCmsPage)
     );
   }
@@ -67,7 +76,9 @@ export class FsEditingAreaInjectorPipelineStep implements PipelineStep {
   }
 }
 
-export function createFsEditingAreaInjectorPipelineStep(fsSpartacusBridgeConfig: FsSpartacusBridgeConfig) {
+export function createFsEditingAreaInjectorPipelineStep(
+  fsSpartacusBridgeConfig: FsSpartacusBridgeConfig, baseSiteService: BaseSiteService
+) {
   const fsComponentInjector: FsCmsPageComponentInjector = new FsCmsPageComponentInjector(FsEditingAreaComponent.TYPE_CODE);
-  return new FsEditingAreaInjectorPipelineStep(fsComponentInjector, fsSpartacusBridgeConfig);
+  return new FsEditingAreaInjectorPipelineStep(fsComponentInjector, fsSpartacusBridgeConfig, baseSiteService);
 }

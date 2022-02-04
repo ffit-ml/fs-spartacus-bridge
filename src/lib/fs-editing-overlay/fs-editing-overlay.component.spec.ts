@@ -2,10 +2,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FsEditingOverlayComponent } from './fs-editing-overlay.component';
 import { CmsComponentData, OutletModule, PageComponentModule } from '@spartacus/storefront';
 import { CommonModule } from '@angular/common';
-import { CmsService, TranslationService, RoutingService } from '@spartacus/core';
+import { CmsService, TranslationService, RoutingService, BaseSiteService } from '@spartacus/core';
 import { of } from 'rxjs';
 import { FsSpartacusBridgeConfig } from 'fs-spartacus-common';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MockBaseSiteService } from '../fs/cms/page/processing/merge/cms-structure-model-merger-factory.spec';
 
 describe('FsEditingOverlayComponent', () => {
   let component: FsEditingOverlayComponent;
@@ -43,6 +44,10 @@ describe('FsEditingOverlayComponent', () => {
           provide: RoutingService,
           useValue: {},
         },
+        {
+          provide: BaseSiteService,
+          useValue: MockBaseSiteService
+        }
       ],
     }).compileComponents();
   });

@@ -1,17 +1,22 @@
 import { PipelineStep } from '../pipeline-step';
-import { CmsStructureModel } from '@spartacus/core';
+import { BaseSiteService, CmsStructureModel } from '@spartacus/core';
 import { getSlotIgnoreCase } from '../../../../util/content-slots';
 import { Injectable } from '@angular/core';
 import { FsCmsPageComponentInjector } from '../fs-cms-page-component-injector';
 import { FsEditingOverlayComponent } from '../../../../../fs-editing-overlay/fs-editing-overlay.component';
 import { getFsManagedPageConfigByTemplateId } from '../../../../util/helper';
 import { FsSpartacusBridgeConfig, Optional } from 'fs-spartacus-common';
+import { first } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FsEditingOverlayInjectorPipelineStep implements PipelineStep {
-  constructor(private fsComponentInjector: FsCmsPageComponentInjector, private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig) {}
+  constructor(
+    private fsComponentInjector: FsCmsPageComponentInjector,
+    private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig,
+    private baseSiteService: BaseSiteService
+  ) {}
 
   execute(occCmsStructureModel: CmsStructureModel, fsCmsStructureModel: CmsStructureModel): CmsStructureModel {
     return this.addFsEditingOverlaysToOccCmsPage(occCmsStructureModel, fsCmsStructureModel);
@@ -40,8 +45,12 @@ export class FsEditingOverlayInjectorPipelineStep implements PipelineStep {
   }
 
   private findFirstSpiritManagedPage(occCmsPage: CmsStructureModel, fsCmsPage: CmsStructureModel) {
+    let baseSite;
+    this.baseSiteService.getActive().pipe(first()).subscribe(
+      activeBaseSite => baseSite = activeBaseSite
+    );
     return getFsManagedPageConfigByTemplateId(
-      this.fsSpartacusBridgeConfig.firstSpiritManagedPages,
+      this.fsSpartacusBridgeConfig.bridge[baseSite].firstSpiritManagedPages,
       this.tryGetPageTemplate(occCmsPage) || this.tryGetPageTemplate(fsCmsPage)
     );
   }
@@ -56,7 +65,10 @@ export class FsEditingOverlayInjectorPipelineStep implements PipelineStep {
   }
 }
 
-export function createFsEditingOverlayInjectorPipelineStep(fsSpartacusBridgeConfig: FsSpartacusBridgeConfig) {
+export function createFsEditingOverlayInjectorPipelineStep(
+  fsSpartacusBridgeConfig: FsSpartacusBridgeConfig,
+  baseSiteService: BaseSiteService
+) {
   const fsComponentInjector: FsCmsPageComponentInjector = new FsCmsPageComponentInjector(FsEditingOverlayComponent.TYPE_CODE);
-  return new FsEditingOverlayInjectorPipelineStep(fsComponentInjector, fsSpartacusBridgeConfig);
+  return new FsEditingOverlayInjectorPipelineStep(fsComponentInjector, fsSpartacusBridgeConfig, baseSiteService);
 }

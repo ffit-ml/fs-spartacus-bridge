@@ -1,23 +1,24 @@
 import { PreviewTranslationKey as TranslationKey } from '../fs/cms/page/preview/preview-translation.service';
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CmsComponent, CmsService, RoutingService, Page, RouterState, PageType } from '@spartacus/core';
 import { CmsComponentData } from '@spartacus/storefront';
-import { combineLatest, Observable, from, of } from 'rxjs';
+import { combineLatest, Observable, from, of, Subscription } from 'rxjs';
 import { map, switchMap, take, withLatestFrom } from 'rxjs/operators';
 import { TppWrapperService } from '../fs/cms/page/tpp-wrapper-service';
 import { nullSafe, errorToString } from 'fs-spartacus-common';
 import { PreviewService } from '../fs/cms/page/preview/preview.service';
 import { extractPageUniqueId } from '../fs/util/occ-cms-pages';
-import { CreatePageResult } from 'fs-tpp-api/snap';
+import { CreatePageResult } from '../fs/cms/page/fs-tpp-api.data';
 
 @Component({
   selector: 'fs-fs-editing-overlay',
   templateUrl: './fs-editing-overlay.component.html',
   styleUrls: ['./fs-editing-overlay.component.css'],
 })
-export class FsEditingOverlayComponent {
+export class FsEditingOverlayComponent implements OnDestroy {
   static readonly TYPE_CODE = 'FsEditingOverlay';
   isButtonDisabled = false;
+  private subs$ = new Subscription();
 
   constructor(
     private componentData: CmsComponentData<FsEditingOverlay>,
@@ -43,6 +44,12 @@ export class FsEditingOverlayComponent {
       ])
     )
   );
+
+  ngOnDestroy(): void {
+    if(this.subs$) {
+      this.subs$.unsubscribe();
+    }
+  }
 
   private getComponentDataWithFlexType(componentUid: string) {
     return this.cmsService.getComponentData<any>(componentUid).pipe(
@@ -98,7 +105,7 @@ export class FsEditingOverlayComponent {
   async addContent(): Promise<void> {
     if (!this.isButtonDisabled) {
       this.isButtonDisabled = true;
-      this.getLatestPagePreviewData().subscribe(async (pagePreviewData) => {
+      this.subs$.add(this.getLatestPagePreviewData().subscribe(async (pagePreviewData) => {
         const [previewElement, componentDataAndPage] = nullSafe(pagePreviewData, []);
         const [componentData, page, routerState] = nullSafe(componentDataAndPage, []);
         if (await this.previewService.isFirstSpiritManagedPage(previewElement)) {
@@ -121,7 +128,7 @@ export class FsEditingOverlayComponent {
         }
         this.isButtonDisabled = false;
         this.changeDetectorRef.detectChanges();
-      });
+      }));
     }
   }
 }

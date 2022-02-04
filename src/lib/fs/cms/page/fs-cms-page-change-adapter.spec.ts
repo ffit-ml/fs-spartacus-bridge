@@ -4,13 +4,14 @@ import { TppWrapperService } from './tpp-wrapper-service';
 import { of } from 'rxjs';
 import { FsCmsPageChangeAdapter } from './fs-cms-page-change-adapter';
 import { Injectable, Type } from '@angular/core';
-import { CmsService, CmsStructureModel, ConfigModule, PageType } from '@spartacus/core';
+import { BaseSiteService, CmsService, CmsStructureModel, ConfigModule, PageType } from '@spartacus/core';
 import { FsSpartacusBridgeModule } from '../../../fs-spartacus-bridge.module';
 import { FsCmsPageInterface } from './fs-cms-page.interface';
 
 import createSpy = jasmine.createSpy;
 import Spy = jasmine.Spy;
 import { RouterTestingModule } from '@angular/router/testing';
+import { MockBaseSiteService } from './processing/merge/cms-structure-model-merger-factory.spec';
 
 type RerenderHandler = () => void;
 
@@ -75,7 +76,7 @@ class MockTppWrapperService extends TppWrapperService {
     return of(false);
   }
 
-  onRerenderView(handler: RerenderHandler) {
+  async onRerenderView(handler: RerenderHandler) {
     this.rerenderHandlers.push(handler);
   }
 
@@ -101,8 +102,12 @@ describe('FsCmsPageChangeAdapter', () => {
       imports: [
         RouterTestingModule,
         FsSpartacusBridgeModule.withConfig({
-          caas: { baseUrl: 'baseUrl', project: 'project', apiKey: 'apiKey', tenantId: 'defaultTenant' },
-          firstSpiritManagedPages: [],
+          bridge: {
+            test: {
+              caas: { baseUrl: 'baseUrl', project: 'project', apiKey: 'apiKey', tenantId: 'defaultTenant' },
+              firstSpiritManagedPages: [],
+            }
+          }
         }),
         ConfigModule.forRoot(),
       ],
@@ -110,6 +115,7 @@ describe('FsCmsPageChangeAdapter', () => {
         { provide: CmsService, useValue: { getCurrentPage: () => of({}) } },
         { provide: CaasClientFactory, useFactory: caasClientFactory(caasClient) },
         { provide: TppWrapperService, useClass: MockTppWrapperService },
+        { provide: BaseSiteService, useClass: MockBaseSiteService },
       ],
     });
   });

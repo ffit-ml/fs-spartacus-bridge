@@ -1,8 +1,9 @@
 import { TppStatusService } from '../cms/page/tpp-status-service';
-import { GlobalMessageService, GlobalMessageType, HttpErrorHandler, Priority } from '@spartacus/core';
+import { BaseSiteService, GlobalMessageService, GlobalMessageType, HttpErrorHandler, Priority } from '@spartacus/core';
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse, HttpRequest } from '@angular/common/http';
 import { FsSpartacusBridgeConfig } from 'fs-spartacus-common';
+import { first, take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -14,6 +15,7 @@ export class CaasForbiddenHandler extends HttpErrorHandler {
   constructor(
     private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig,
     private tppStatusService: TppStatusService,
+    private baseSiteService: BaseSiteService,
     globalMessageService: GlobalMessageService
   ) {
     super(globalMessageService);
@@ -24,7 +26,9 @@ export class CaasForbiddenHandler extends HttpErrorHandler {
   }
 
   handleError(request: HttpRequest<any>, errorResponse: HttpErrorResponse): void {
-    this.tppStatusService.isFirstSpiritPreview().subscribe((previewMode) => {
+    this.tppStatusService.isFirstSpiritPreview().pipe(
+      take(1)
+    ).subscribe((previewMode: boolean) => {
       if (this.isCaasRequest(request)) {
         this.handleCaasError(previewMode);
       } else {
@@ -34,7 +38,11 @@ export class CaasForbiddenHandler extends HttpErrorHandler {
   }
 
   private isCaasRequest(request: HttpRequest<any>) {
-    return request && request.url.includes(this.fsSpartacusBridgeConfig.caas.baseUrl);
+    let baseSite;
+    this.baseSiteService.getActive().pipe(first()).subscribe(
+      activeBaseSite => baseSite = activeBaseSite
+    );
+    return request && request.url.includes(this.fsSpartacusBridgeConfig.bridge[baseSite].caas.baseUrl);
   }
 
   private handleCaasError(previewMode: boolean) {

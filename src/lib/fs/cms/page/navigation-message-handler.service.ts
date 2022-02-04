@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 import { PreviewPageService } from './preview/preview-page.service';
+import { WindowRef } from '@spartacus/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class NavigationMessageHandlerService {
-  constructor(private previewPageService: PreviewPageService) {}
+  constructor(private previewPageService: PreviewPageService, private winRef: WindowRef) {}
 
   initialize(): void {
-    window.addEventListener(
+    this.winRef.nativeWindow?.addEventListener(
       'message',
       (event) => {
         this.handleNavigationMessage(event);
@@ -18,7 +19,7 @@ export class NavigationMessageHandlerService {
   }
 
   destroy() {
-    window.removeEventListener('message', this.handleNavigationMessage, false);
+    this.winRef.nativeWindow?.removeEventListener('message', this.handleNavigationMessage, false);
   }
 
   private handleNavigationMessage(event: MessageEvent) {

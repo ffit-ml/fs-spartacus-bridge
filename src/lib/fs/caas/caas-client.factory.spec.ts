@@ -1,11 +1,12 @@
 import { TppStatusService } from '../cms/page/tpp-status-service';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { ConfigModule } from '@spartacus/core';
+import { BaseSiteService, ConfigModule } from '@spartacus/core';
 import { of } from 'rxjs';
 
 import { FsSpartacusBridgeModule } from '../../fs-spartacus-bridge.module';
 import { CaasClientFactory } from './caas-client.factory';
+import { MockBaseSiteService } from '../cms/page/processing/merge/cms-structure-model-merger-factory.spec';
 
 describe('CaasCollectionClientFactory', () => {
   beforeEach(() => {
@@ -13,11 +14,18 @@ describe('CaasCollectionClientFactory', () => {
       imports: [
         HttpClientTestingModule,
         FsSpartacusBridgeModule.withConfig({
-          caas: { baseUrl: 'https://baseUrl', project: 'project', apiKey: 'apiKey', tenantId: 'defaultTenant' },
-          firstSpiritManagedPages: [],
+          bridge: {
+            test: {
+              caas: { baseUrl: 'https://baseUrl', project: 'project', apiKey: 'apiKey', tenantId: 'defaultTenant' },
+              firstSpiritManagedPages: [],
+            }
+          }
         }),
         ConfigModule.forRoot(),
       ],
+      providers: [
+        { provide: BaseSiteService, useClass: MockBaseSiteService }
+      ]
     });
   });
 

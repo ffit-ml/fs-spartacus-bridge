@@ -1,11 +1,13 @@
 import { REPLACE } from '../merge/strategies';
 import { FsCmsPageComponentInjector } from '../fs-cms-page-component-injector';
-import { CmsStructureModel, PageType } from '@spartacus/core';
+import { BaseSiteService, CmsStructureModel, PageType } from '@spartacus/core';
 
 import { APPEND } from '../merge/strategies';
 import { FsEditingAreaInjectorPipelineStep } from './fs-editing-area-injector-pipeline-step';
 import { FsEditingAreaComponent } from '../../../../../fs-editing-area/fs-editing-area.component';
 import { FsSpartacusBridgeConfig, FirstSpiritManagedPage } from 'fs-spartacus-common';
+import { TestBed } from '@angular/core/testing';
+import { MockBaseSiteService } from '../merge/cms-structure-model-merger-factory.spec';
 
 describe('FsEditingAreaInjectorPipelineStep', () => {
   function createTestPage(slots: any) {
@@ -24,21 +26,31 @@ describe('FsEditingAreaInjectorPipelineStep', () => {
 
   beforeEach(() => {
     fsSpartacusBridgeConfig = {
-      caas: { baseUrl: '', project: '', apiKey: '', tenantId: '' },
-      firstSpiritManagedPages: [
-        FirstSpiritManagedPage.enhanceSapPages('LandingPage2Template', [
-          { name: 'Section1', mergeStrategy: APPEND },
-          { name: 'BottomHeaderSlot', mergeStrategy: REPLACE },
-        ]),
-        FirstSpiritManagedPage.integrateFsDrivenPagesIntoSapSkeleton('homepage', PageType.CONTENT_PAGE, 'MyFirstSpiritDrivenPageTemplate', [
-          { name: 'Section1', mergeStrategy: REPLACE },
-        ]),
-      ],
+      bridge: {
+        test: {
+          caas: { baseUrl: '', project: '', apiKey: '', tenantId: '' },
+          firstSpiritManagedPages: [
+            FirstSpiritManagedPage.enhanceSapPages('LandingPage2Template', [
+              { name: 'Section1', mergeStrategy: APPEND },
+              { name: 'BottomHeaderSlot', mergeStrategy: REPLACE },
+            ]),
+            FirstSpiritManagedPage.integrateFsDrivenPagesIntoSapSkeleton('homepage', PageType.CONTENT_PAGE, 'MyFirstSpiritDrivenPageTemplate', [
+              { name: 'Section1', mergeStrategy: REPLACE },
+            ]),
+          ],
+        }
+      }
     };
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: BaseSiteService, useClass: MockBaseSiteService },
+      ],
+    });
 
     const fsComponentWrapper = new FsCmsPageComponentInjector(FsEditingAreaComponent.TYPE_CODE);
     fsEditingAreaWrapperSpy = spyOn(fsComponentWrapper, 'addCmsPageComponents');
-    fsEditingAreaPipelineStep = new FsEditingAreaInjectorPipelineStep(fsComponentWrapper, fsSpartacusBridgeConfig);
+    const baseSiteService = TestBed.inject(BaseSiteService)
+    fsEditingAreaPipelineStep = new FsEditingAreaInjectorPipelineStep(fsComponentWrapper, fsSpartacusBridgeConfig, baseSiteService);
   });
 
   it('should inject the editing area component in all fs managed slots, if the fs page is undefined', () => {
