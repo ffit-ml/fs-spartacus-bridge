@@ -1,11 +1,13 @@
 import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import { Inject, Injectable, NgZone, OnDestroy, RendererFactory2 } from '@angular/core';
-import { CmsService, Page } from '@spartacus/core';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { BaseSiteService, CmsService, Page } from '@spartacus/core';
+import { distinctUntilChanged, first, map } from 'rxjs/operators';
 import { NavigationMessageHandlerService } from './navigation-message-handler.service';
 import { DOCUMENT } from '@angular/common';
 import { TppLoaderService } from './tpp-loader.service';
 import { SNAP } from './fs-tpp-api.data';
+import { FsSpartacusBridgeConfig } from 'fs-spartacus-common';
+import { createCaasAccessData } from '../../util/helper';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +23,8 @@ export class TppStatusService implements OnDestroy {
     private navigationMessageHandlerService: NavigationMessageHandlerService,
     private rendererFactory: RendererFactory2,
     private tppLoaderService: TppLoaderService,
+    private baseSiteService: BaseSiteService,
+    private config: FsSpartacusBridgeConfig,
     @Inject(DOCUMENT) private document,
   ) {
     const isConnected = new BehaviorSubject(false);
@@ -28,7 +32,6 @@ export class TppStatusService implements OnDestroy {
     this.firstSpiritPreview = isConnected.pipe(distinctUntilChanged());
     this.tppLoaderService.getSnap()?.then(snap => {
       this.TPP_SNAP = snap;
-
       if (this.TPP_SNAP) {
         this.TPP_SNAP.onInit((success: boolean) => this.ngZone.run(() => isConnected.next(success)));
       }
@@ -41,6 +44,7 @@ export class TppStatusService implements OnDestroy {
           this.overrideTranslateButton();
           this.adjustCreateComponentPosition();
           this.navigationMessageHandlerService.initialize();
+          this.activateCaasMode(isFirstSpiritPreview);
         } else {
           renderer.removeAttribute(this.document.body, 'dnd-orient');
           this.navigationMessageHandlerService.destroy();
@@ -104,5 +108,18 @@ export class TppStatusService implements OnDestroy {
         return enabled;
       }
     });
+  }
+
+  private activateCaasMode(isPreview: boolean): void {
+    this.baseSiteService.getActive().pipe(
+      first(),
+      map((activeBaseSite: string) => {
+        const caasAccessData = createCaasAccessData(this.config, activeBaseSite, isPreview);
+        this.TPP_SNAP.enableCaasMode(
+          caasAccessData.collectionUrl() ,
+          this.config.bridge[activeBaseSite].caas.apiKey
+        )
+      })
+    );
   }
 }

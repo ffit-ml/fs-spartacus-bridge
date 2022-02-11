@@ -87,6 +87,7 @@ export interface SNAP {
   execute(identifier: string, params?: object, result?: boolean): Promise<any>;
   showEditDialog(previewId: string);
   overrideDefaultButton(defaultButtonName: string, buttonOverrides: Button | null): void;
+  enableCaasMode(previewCollection: string, apiKey: string, options?: { updateTimeout?: number }): void
 }
 
 export interface Button {

@@ -1,7 +1,9 @@
 import { FsCmsPageInterface } from '../cms/page/fs-cms-page.interface';
-import { FirstSpiritManagedPage, arrayify, Optional } from 'fs-spartacus-common';
-import { throwError, iif, of, Observable } from 'rxjs';
-import { map, retryWhen, concatMap, delay, switchMap, tap } from 'rxjs/operators';
+import { arrayify, FirstSpiritManagedPage, FsSpartacusBridgeConfig, Optional } from 'fs-spartacus-common';
+import { iif, Observable, of, throwError } from 'rxjs';
+import { concatMap, delay, map, retryWhen, switchMap, tap } from 'rxjs/operators';
+import { CaasAccessData } from '../caas/caas-access-data';
+import { CaasCollection } from '../caas/caas-collection';
 
 const DEFAULT_INITIAL_DELAY = 500;
 const DEFAULT_RETRY_DELAY = 750;
@@ -106,4 +108,15 @@ export function reExecutable<T extends (...args: any[]) => Observable<any>, S ex
         )
       )
     );
+}
+
+
+export function createCaasAccessData(config: FsSpartacusBridgeConfig, baseSite: string, isPreview: boolean) {
+  return new CaasAccessData(
+    config.bridge[baseSite].caas.baseUrl,
+    config.bridge[baseSite].caas.tenantId,
+    config.bridge[baseSite].caas.project,
+    isPreview ? CaasCollection.PREVIEW_CONTENT : CaasCollection.RELEASE_CONTENT,
+    config.bridge[baseSite].caas.apiKey
+  );
 }

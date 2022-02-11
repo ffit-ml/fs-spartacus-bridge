@@ -109,4 +109,9 @@ export class TppWrapperService {
     const snap = await this.TPP_SNAP;
     return snap?.showEditDialog(previewId);
   }
+
+  async enableCaasMode(previewCollection: string, apiKey: string, options?: { updateTimeout?: number }): Promise<void> {
+    const snap = await this.TPP_SNAP;
+    snap.enableCaasMode(previewCollection, apiKey, options)
+  }
 }

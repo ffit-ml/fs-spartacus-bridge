@@ -138,11 +138,7 @@ describe('TppEventHandlerService', () => {
     initialPreviewId: string = DEFAULT_INITIAL_PREVIEW_ID,
     previewId: string = DEFAULT_PREVIEW_ID
   ): Promise<void> => {
-    expect((tppEventHandler as any).isFirstOnRequestPreviewElementCall).toBe(true);
     tppEventHandler.initialize();
-    expect((tppEventHandler as any).isFirstOnRequestPreviewElementCall).toBe(true);
-    (tppWrapperService as MockTppWrapperService).triggerOnRequestPreviewElementHandler(initialPreviewId);
-    expect((tppEventHandler as any).isFirstOnRequestPreviewElementCall).toBe(false);
     (tppWrapperService as MockTppWrapperService).triggerOnRequestPreviewElementHandler(previewId);
     return (ngZone as MockNgZone).onRequestPreviewElementHandler();
   };

@@ -4,17 +4,16 @@ import { FsCmsPageInterface } from './fs-cms-page.interface';
 import { TppWrapperService } from './tpp-wrapper-service';
 import { Injectable, NgZone } from '@angular/core';
 import { CaasClientFactory } from '../../caas/caas-client.factory';
-import { combineLatest, iif, throwError, of } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { LanguageService, PageType } from '@spartacus/core';
-import { take, switchMap, first } from 'rxjs/operators';
+import { first, map, switchMap, take } from 'rxjs/operators';
 import { PreviewPageService } from './preview/preview-page.service';
-import { findDocumentsInCaasResponse, reExecutable, bind } from '../../util/helper';
+import { findDocumentsInCaasResponse } from '../../util/helper';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TppEventHandlerService {
-  private isFirstOnRequestPreviewElementCall: boolean;
 
   constructor(
     private tppWrapperService: TppWrapperService,
@@ -23,20 +22,10 @@ export class TppEventHandlerService {
     private caasClientFactory: CaasClientFactory,
     private ngZone: NgZone,
     private previewService: PreviewService
-  ) {
-    this.isFirstOnRequestPreviewElementCall = true;
-  }
+  ) {}
 
   initialize() {
     this.tppWrapperService.onRequestPreviewElement((previewId: string) => {
-      // TPP_SNAP calls the onRequestPreviewElement() event handler regardless of whether it is the
-      // initial page load, the creation of a page or the click on a report item.
-      // Since we want to ignore this initial call, we need to store whether the handler has been
-      // called once since the service was created
-      if (this.isFirstOnRequestPreviewElementCall) {
-        this.isFirstOnRequestPreviewElementCall = false;
-        return;
-      }
       this.ngZone.run(async () => {
         const currentPreviewId = await this.tppWrapperService.getPreviewElement();
         if (previewId != null && currentPreviewId !== previewId) {
@@ -96,23 +85,14 @@ export class TppEventHandlerService {
     });
   }
 
-  private getByUidResponseHandler(caasResponse: any): any {
-    const firstCaasDocument = findDocumentsInCaasResponse(caasResponse)[0];
-    return iif(
-      () => firstCaasDocument == null,
-      throwError('The requested page is not available yet (the CaaS response was empty)'),
-      of(firstCaasDocument)
-    );
-  }
-
   private async fetchPageFromCaas(pageUid: string): Promise<any> {
     const caasClientFactoryObservable = this.caasClientFactory.createCaasClient().pipe(take(1));
     const activeLanguageObservable = this.languageService.getActive().pipe(take(1));
     return combineLatest([caasClientFactoryObservable, activeLanguageObservable])
       .pipe(
-        switchMap(([caasClient, lang]) => reExecutable(bind(caasClient.getByUid, caasClient), this.getByUidResponseHandler)(pageUid, lang)),
-        switchMap((result) => result),
-        first()
+        switchMap(([caasClient, lang]) => caasClient.getByUid(pageUid, lang)),
+        map(caasResponse => findDocumentsInCaasResponse(caasResponse)[0]),
+        first(),
       )
       .toPromise()
       .catch(console.error);
