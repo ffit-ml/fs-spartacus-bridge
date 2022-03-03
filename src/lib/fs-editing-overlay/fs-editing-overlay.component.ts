@@ -10,6 +10,9 @@ import { PreviewService } from '../fs/cms/page/preview/preview.service';
 import { extractPageUniqueId } from '../fs/util/occ-cms-pages';
 import { CreatePageResult } from '../fs/cms/page/fs-tpp-api.data';
 
+/**
+ * This overlay component marks empty slots in that content can be added.
+ */
 @Component({
   selector: 'fs-fs-editing-overlay',
   templateUrl: './fs-editing-overlay.component.html',

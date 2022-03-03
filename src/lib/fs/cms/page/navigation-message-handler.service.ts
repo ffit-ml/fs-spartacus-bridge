@@ -2,12 +2,22 @@ import { Injectable } from '@angular/core';
 import { PreviewPageService } from './preview/preview-page.service';
 import { WindowRef } from '@spartacus/core';
 
+/**
+ * This service handles message events which are fired by fs-tpp-api/snap and initiates actions accordingly.
+ *
+ * @export
+ * @class NavigationMessageHandlerService
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class NavigationMessageHandlerService {
   constructor(private previewPageService: PreviewPageService, private winRef: WindowRef) {}
 
+  /**
+   * This method initializes the message EventListener and handles the navigation of the preview to a SAP Commerce page.
+   *
+   */
   initialize(): void {
     this.winRef.nativeWindow?.addEventListener(
       'message',
@@ -18,6 +28,9 @@ export class NavigationMessageHandlerService {
     );
   }
 
+  /**
+   * This method destroys the EventListener attached during initialize().
+   */
   destroy() {
     this.winRef.nativeWindow?.removeEventListener('message', this.handleNavigationMessage, false);
   }

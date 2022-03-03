@@ -70,3 +70,6 @@ testem.log
 # Windows
 Thumbs.db
 ehthumbs.db
+
+# generated Documentation
+documentation/

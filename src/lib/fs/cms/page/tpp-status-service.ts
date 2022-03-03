@@ -9,6 +9,13 @@ import { SNAP } from './fs-tpp-api.data';
 import { FsSpartacusBridgeConfig } from 'fs-spartacus-common';
 import { createCaasAccessData } from '../../util/helper';
 
+/**
+ * This service checks if the application should display preview content or live content and
+ * initializes the preview view if necessary.
+ *
+ * @export
+ * @class TppStatusService
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -69,6 +76,11 @@ export class TppStatusService implements OnDestroy {
     }
   }
 
+  /**
+   * This method returns an Observable which contains the information if the application should run in preview mode.
+   *
+   * @return An Observable containing a boolean: True means the application should run in preview mode.
+   */
   isFirstSpiritPreview(): Observable<boolean> {
     return this.firstSpiritPreview;
   }

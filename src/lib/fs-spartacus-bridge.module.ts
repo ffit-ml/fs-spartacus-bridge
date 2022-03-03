@@ -10,6 +10,10 @@ import { CaasUnauthorizedHandler } from './fs/caas/caas-unauthorized.handler';
 import { FsEditingAreaComponent } from './fs-editing-area/fs-editing-area.component';
 import { FsSpartacusBridgeConfig, FsSpartacusCommonModule } from 'fs-spartacus-common';
 
+/**
+ * Base Module of the Library that configures the processing of CMS page by importing
+ * {@link FsCmsPageModule} and sets up the error handlers
+ */
 @NgModule({
   declarations: [FsEditingOverlayComponent, FsEditingAreaComponent],
   imports: [

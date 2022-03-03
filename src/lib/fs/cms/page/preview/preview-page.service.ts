@@ -2,6 +2,12 @@
 import { SemanticPathService, PageType } from '@spartacus/core';
 import { Router } from '@angular/router';
 
+/**
+ * This service handles the URL creation and the navigation for the preview within the ContentCreator.
+ *
+ * @export
+ * @class PreviewPageService
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -53,6 +59,13 @@ export class PreviewPageService {
     return url?.startsWith('/') ? `${url}` : `/${url}`;
   }
 
+  /**
+   * This method navigates the preview to a SAP Commerce page by a given ID.
+   *
+   * @param {string} hybrisPageId The ID of the SAP Commerce page to navigate the preview to.
+   * @return {Promise<boolean>} Promise to resolve with whether the navigation was successful.
+   * @memberof PreviewPageService
+   */
   async navigateTo(hybrisPageId: string): Promise<boolean> {
     const url = this.assembleUrl(hybrisPageId);
     if (url != null) {

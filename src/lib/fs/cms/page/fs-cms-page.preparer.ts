@@ -9,6 +9,12 @@ import { CaasClient } from '../../caas/caas-client';
 import { bind, findDocumentsInCaasResponse } from '../../util/helper';
 import { FsSpartacusBridgeConfig } from 'fs-spartacus-common';
 
+/**
+ * This converter prepares FirstSpirit media input components and dataset references for further processing.
+ *
+ * @export
+ * @class FsCmsPagePreparer
+ */
 @Injectable({ providedIn: 'root' })
 export class FsCmsPagePreparer implements Converter<FsCmsPageInterface, Observable<FsCmsPageInterface>> {
   private source: FsCmsPageInterface;

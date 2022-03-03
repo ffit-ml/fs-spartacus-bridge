@@ -1,9 +1,23 @@
 import { CmsStructureModel, ContentSlotComponentData, ContentSlotData, CmsComponent } from '@spartacus/core';
 import { merge, setIn } from 'immutable';
 
+/**
+ * This injector handles the adding of the FirstSpirit components to the configured slots.
+ *
+ * @export
+ * @class FsCmsPageComponentInjector
+ */
 export class FsCmsPageComponentInjector {
   constructor(private typeCode: string) {}
 
+  /**
+   * This method adds the FirstSpirit components to the provided cms page and slots list.
+   *
+   * @param {CmsStructureModel} cmsPage The page to which the components will be added.
+   * @param {string[]} slots The array of slots to which the components will be added.
+   * @return {CmsStructureModel} The merged page.
+   * @memberof FsCmsPageComponentInjector
+   */
   addCmsPageComponents(cmsPage: CmsStructureModel, slots: string[]): CmsStructureModel {
     if (cmsPage) {
       const adaptedSlots = this.adaptSlots(cmsPage, slots);

@@ -8,6 +8,11 @@ import { CaasClientFactory } from '../../caas/caas-client.factory';
 
 import { FsCmsPageInterface } from './fs-cms-page.interface';
 
+/**
+ * This converter prepares the data by replacing non-existent language specific data with the fallback language ones.
+ *
+ * @export
+ */
 @Injectable({ providedIn: 'root' })
 export class FsCmsPageLanguageFallbackReplacer implements Converter<FsCmsPageInterface, Observable<FsCmsPageInterface>> {
   private source: FsCmsPageInterface;

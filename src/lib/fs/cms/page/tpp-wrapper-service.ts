@@ -14,6 +14,13 @@ export interface PageTypeMappingResult {
   pageFolder: string;
 }
 
+/**
+ * This service wraps the fs-tpp-api/snap implementation into a typed one for a TypeScript accessible package.
+ * See the fs-tpp-api/snap [documentation]{@link https://docs.e-spirit.com/tpp/snap/} for more information.
+ *
+ * @export
+ * @class TppWrapperService
+ */
 @Injectable({
   providedIn: 'root',
 })

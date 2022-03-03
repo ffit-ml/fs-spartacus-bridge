@@ -10,6 +10,12 @@ import { first, map, switchMap, take } from 'rxjs/operators';
 import { PreviewPageService } from './preview/preview-page.service';
 import { findDocumentsInCaasResponse } from '../../util/helper';
 
+/**
+ * This service handles events fired by the fs-tpp-api/snap implementation.
+ *
+ * @export
+ * @class TppEventHandlerService
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -24,6 +30,9 @@ export class TppEventHandlerService {
     private previewService: PreviewService
   ) {}
 
+  /**
+   * This method initializes the listening on the RequestPreviewElement event.
+   */
   initialize() {
     this.tppWrapperService.onRequestPreviewElement((previewId: string) => {
       this.ngZone.run(async () => {

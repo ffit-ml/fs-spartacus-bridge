@@ -5,6 +5,12 @@ import { Injector } from '@angular/core';
 import { FirstSpiritManagedPage, FirstSpiritManagedSlot, MergeStrategy, nullSafe, toMap, uniquify, arrayify } from 'fs-spartacus-common';
 import { REPLACE } from './strategies';
 
+/**
+ * This class merges the FirstSpirit CMS structure with the SAP Commerce CMS structure.
+ *
+ * @export
+ * @class CmsStructureModelMerger
+ */
 export class CmsStructureModelMerger {
   private fsMangedSlotsMergeConfig: Map<string, FirstSpiritManagedSlot>;
 
@@ -12,6 +18,15 @@ export class CmsStructureModelMerger {
     this.fsMangedSlotsMergeConfig = toMap(this.firstSpiritManagedPage.slots, (slot) => slot.name);
   }
 
+  /**
+   * This method merges the two given CmsStructureModels on the basis of the merge configuration and throws an error if both parameters are invalid.
+   * If the given FirstSpirit model is invalid the method returns the SAP model as is.
+   *
+   * @param {CmsStructureModel} occStructureModel The SAP Commerce CmsStructureModel to be merged.
+   * @param {CmsStructureModel} fsStructureModel The FirstSpirit CmsStructureModel to be merged.
+   * @return {CmsStructureModel} The merged page structure.
+   * @memberof CmsStructureModelMerger
+   */
   merge(occStructureModel: CmsStructureModel, fsStructureModel: CmsStructureModel): CmsStructureModel {
     const occPageExists = this.pageExists(occStructureModel);
     const fsPageExists = this.pageExists(fsStructureModel);

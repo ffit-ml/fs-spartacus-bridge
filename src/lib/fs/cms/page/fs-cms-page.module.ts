@@ -17,6 +17,12 @@ import { FsCmsPageAdaptersFacade, LIVE_FS_CMS_PAGE_ADAPTER, PREVIEW_FS_CMS_PAGE_
 import { FsCmsPageContextFactory } from './fs-cms-page.context-factory';
 import { FsCmsPageLanguageFallbackReplacer } from './fs-cms-page-language-fallback.replacer';
 
+/**
+ * This module configures the page adapters and other dependencies needed to process a FirstSpirit page.
+ *
+ * @export
+ * @class FsCmsPageModule
+ */
 @NgModule({
   imports: [FsCmsPageProcessingModule],
   providers: [

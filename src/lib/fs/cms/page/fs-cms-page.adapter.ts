@@ -7,6 +7,11 @@ import { CaasClientFactory } from '../../caas/caas-client.factory';
 import { extractPageUniqueId } from '../../util/occ-cms-pages';
 import { findDocumentsInCaasResponse } from '../../util/helper';
 
+/**
+ * This class loads the FirstSpirit page data from the shop backend.
+ *
+ * @export
+ */
 @Injectable({
   providedIn: 'root',
 })

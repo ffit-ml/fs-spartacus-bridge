@@ -5,6 +5,12 @@ import { FsSpartacusBridgeConfig } from 'fs-spartacus-common';
 import { BaseSiteService } from '@spartacus/core';
 import { first } from 'rxjs/operators';
 
+/**
+ * This factory creates a {@link CmsStructureModelMerger} for the given page template.
+ *
+ * @export
+ * @class CmsStructureModelMergerFactory
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -14,6 +20,14 @@ export class CmsStructureModelMergerFactory {
               private injector: Injector
   ) {}
 
+  /**
+   * This method creates a CmsStructureModelMerger for a given page template.
+   * If the given ID of the page template cannot be resolved it returns "undefined".
+   *
+   * @param {string} pageTemplate The ID of the page template to create a CmsStructureModelMerger for.
+   * @return {(CmsStructureModelMerger | undefined)} The created instance or undefined if no corresponding page can be found.
+   * @memberof CmsStructureModelMergerFactory
+   */
   createFsCmsPageMerger(pageTemplate: string): CmsStructureModelMerger | undefined {
     let baseSite;
     this.baseSiteService.getActive().pipe(first()).subscribe(

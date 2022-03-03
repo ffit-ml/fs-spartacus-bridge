@@ -7,6 +7,9 @@ import { FsSpartacusBridgeConfig, arrayify } from 'fs-spartacus-common';
 import { first, map, take } from 'rxjs/operators';
 import { getFsManagedPageConfigByTemplateId } from '../../util/helper';
 
+/**
+ * This service decides how to process FirstSpirit Driven Pages (either a page based on SAP Commerce or a pure FirstSpirit page).
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -19,6 +22,12 @@ export class FsDrivenPageService {
     private baseSiteService: BaseSiteService
   ) {}
 
+  /**
+   * This method checks for a given FirstSpirit Page if an SAP Commerce counterpart exists or if it is a pure FirstSpirit page.
+   *
+   * @param fsCmsPage The FirstSpirit page which needs to be checked for a SAP Commerce counterpart.
+   * @return An Observable which contains the CMS data for the requested page.
+   */
   process(fsCmsPage: CmsStructureModel): null | Observable<CmsStructureModel> {
     if (fsCmsPage) {
       const templateId = fsCmsPage?.page?.template?.toLocaleLowerCase();

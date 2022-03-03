@@ -9,6 +9,12 @@ const DEFAULT_INITIAL_DELAY = 500;
 const DEFAULT_RETRY_DELAY = 750;
 const DEFAULT_MAX_RETRIES = 4;
 
+/**
+ * This function retrieves the FirstSpiritManagedPage from the given config by the given ID of the template and returns it.
+ *
+ * @param fsManagedPagesConfig The FirstSpirit Managed Pages config.
+ * @param templateId The ID of the template for which to look for.
+ */
 export function getFsManagedPageConfigByTemplateId(
   fsManagedPagesConfig: FirstSpiritManagedPage[],
   templateId: string
@@ -17,6 +23,13 @@ export function getFsManagedPageConfigByTemplateId(
   return fsManagedPagesConfig.find((managedPage) => transformCase(managedPage.template) === transformCase(templateId));
 }
 
+/**
+ * This function checks for FirstSpirit CMS pages in a given CaaS response and returns them.
+ *
+ * @export
+ * @param response CaaS response to parse for pages.
+ * @return The pages found in the CaaS response.
+ */
 export function findDocumentsInCaasResponse(response: any): FsCmsPageInterface[] {
   if (response?._embedded?.['rh:doc'] && Array.isArray(response._embedded['rh:doc'])) {
     return arrayify(response._embedded['rh:doc'] as FsCmsPageInterface[]);
