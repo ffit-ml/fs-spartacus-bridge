@@ -54,14 +54,14 @@ describe('FsCmsPageLanguageFallbackReplacer', () => {
                 tenantId: 'defaultTenant',
               },
               firstSpiritManagedPages: [],
-            }
-          }
+            },
+          },
         }),
         ConfigModule.forRoot(),
       ],
       providers: [
         { provide: CaasClientFactory, useFactory: caasClientFactory(caasClient) },
-        { provide: BaseSiteService, useClass: MockBaseSiteService }
+        { provide: BaseSiteService, useClass: MockBaseSiteService },
       ],
     });
   });
@@ -119,14 +119,14 @@ describe('FsCmsPageLanguageFallbackReplacer', () => {
                 tenantId: 'defaultTenant',
               },
               firstSpiritManagedPages: [],
-            }
-          }
+            },
+          },
         }),
         ConfigModule.forRoot(),
       ],
       providers: [
         { provide: CaasClientFactory, useFactory: caasClientFactory(caasClient) },
-        { provide: BaseSiteService, useClass: MockBaseSiteService }
+        { provide: BaseSiteService, useClass: MockBaseSiteService },
       ],
     });
 

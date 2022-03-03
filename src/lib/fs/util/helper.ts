@@ -123,7 +123,6 @@ export function reExecutable<T extends (...args: any[]) => Observable<any>, S ex
     );
 }
 
-
 export function createCaasAccessData(config: FsSpartacusBridgeConfig, baseSite: string, isPreview: boolean) {
   return new CaasAccessData(
     config.bridge[baseSite].caas.baseUrl,

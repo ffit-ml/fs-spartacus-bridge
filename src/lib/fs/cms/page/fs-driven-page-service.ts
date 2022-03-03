@@ -33,10 +33,14 @@ export class FsDrivenPageService {
       const templateId = fsCmsPage?.page?.template?.toLocaleLowerCase();
       if (templateId) {
         let baseSite;
-        this.baseSiteService.getActive().pipe(first()).subscribe(
-          activeBaseSite => baseSite = activeBaseSite
+        this.baseSiteService
+          .getActive()
+          .pipe(first())
+          .subscribe((activeBaseSite) => (baseSite = activeBaseSite));
+        const fsManagedPageConfig = getFsManagedPageConfigByTemplateId(
+          arrayify(this.bridgeConfig?.bridge[baseSite].firstSpiritManagedPages),
+          templateId
         );
-        const fsManagedPageConfig = getFsManagedPageConfigByTemplateId(arrayify(this.bridgeConfig?.bridge[baseSite].firstSpiritManagedPages), templateId);
 
         if (fsManagedPageConfig) {
           const { sapPageIdentifier, sapPageType } = fsManagedPageConfig;

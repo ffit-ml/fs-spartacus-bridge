@@ -1,6 +1,6 @@
 {
   "name": "fs-spartacus-bridge",
-  "version": "4.0.14",
+  "version": "4.0.15",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

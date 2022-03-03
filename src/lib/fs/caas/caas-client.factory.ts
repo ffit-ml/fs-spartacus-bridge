@@ -24,10 +24,11 @@ export class CaasClientFactory {
    * @param {BaseSiteService} baseSiteService The Base site service to use.
    * @memberof CaasClientFactory
    */
-  constructor(private config: FsSpartacusBridgeConfig,
-              private httpClient: HttpClient,
-              private tppStatusService: TppStatusService,
-              private baseSiteService: BaseSiteService
+  constructor(
+    private config: FsSpartacusBridgeConfig,
+    private httpClient: HttpClient,
+    private tppStatusService: TppStatusService,
+    private baseSiteService: BaseSiteService
   ) {}
 
   /**
@@ -39,7 +40,7 @@ export class CaasClientFactory {
   createCaasClient(): Observable<CaasClient> {
     return combineLatest([this.tppStatusService.isFirstSpiritPreview(), this.baseSiteService.getActive()]).pipe(
       map(([ocm, activeBaseSite]) => {
-        const caasCollectionAccessData = createCaasAccessData(this.config, activeBaseSite, ocm)
+        const caasCollectionAccessData = createCaasAccessData(this.config, activeBaseSite, ocm);
 
         return new CaasClient(caasCollectionAccessData, this.httpClient);
       })

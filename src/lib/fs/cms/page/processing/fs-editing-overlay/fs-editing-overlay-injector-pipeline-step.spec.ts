@@ -26,24 +26,25 @@ describe('FsEditingOverlayInjectorPipelineStep', () => {
   beforeEach(() => {
     fsSpartacusBridgeConfig = {
       bridge: {
-        test : {
+        test: {
           caas: { baseUrl: '', project: '', apiKey: '', tenantId: '' },
           firstSpiritManagedPages: [
             FirstSpiritManagedPage.enhanceSapPages('LandingPage2Template', [
               { name: 'Section1', mergeStrategy: APPEND },
               { name: 'Section2', mergeStrategy: APPEND },
             ]),
-            FirstSpiritManagedPage.integrateFsDrivenPagesIntoSapSkeleton('homepage', PageType.CONTENT_PAGE, 'MyFirstSpiritDrivenPageTemplate', [
-              { name: 'Section1', mergeStrategy: REPLACE },
-            ]),
+            FirstSpiritManagedPage.integrateFsDrivenPagesIntoSapSkeleton(
+              'homepage',
+              PageType.CONTENT_PAGE,
+              'MyFirstSpiritDrivenPageTemplate',
+              [{ name: 'Section1', mergeStrategy: REPLACE }]
+            ),
           ],
-        }
-      }
+        },
+      },
     };
     TestBed.configureTestingModule({
-      providers: [
-        { provide: BaseSiteService, useClass: MockBaseSiteService },
-      ],
+      providers: [{ provide: BaseSiteService, useClass: MockBaseSiteService }],
     });
 
     const fsEditingOverlayWrapper = new FsCmsPageComponentInjector(FsEditingOverlayComponent.TYPE_CODE);

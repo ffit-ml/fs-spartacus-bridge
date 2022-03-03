@@ -1,13 +1,7 @@
 ﻿import { occResponse, fsCmsPageWithSapSkeleton, fsDrivenCmsPage } from './fs-driven-page-service.spec.data';
 import { FsDrivenPageService } from './fs-driven-page-service';
 import { TestBed } from '@angular/core/testing';
-import {
-  ConfigModule,
-  PageType,
-  CmsStructureModel,
-  CmsPageAdapter,
-  PageContext, BaseSiteService
-} from '@spartacus/core';
+import { ConfigModule, PageType, CmsStructureModel, CmsPageAdapter, PageContext, BaseSiteService } from '@spartacus/core';
 import { FsSpartacusBridgeModule } from '../../../fs-spartacus-bridge.module';
 import { FirstSpiritManagedPage, copy } from 'fs-spartacus-common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -57,8 +51,8 @@ describe('FsDrivenPageService', () => {
                   []
                 ),
               ],
-            }
-          }
+            },
+          },
         }),
         ConfigModule.forRoot(),
       ],
@@ -73,8 +67,8 @@ describe('FsDrivenPageService', () => {
         },
         {
           provide: BaseSiteService,
-          useClass: MockBaseSiteService
-        }
+          useClass: MockBaseSiteService,
+        },
       ],
     });
 

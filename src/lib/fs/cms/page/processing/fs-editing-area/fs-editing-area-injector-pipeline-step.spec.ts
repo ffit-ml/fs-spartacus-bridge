@@ -34,22 +34,23 @@ describe('FsEditingAreaInjectorPipelineStep', () => {
               { name: 'Section1', mergeStrategy: APPEND },
               { name: 'BottomHeaderSlot', mergeStrategy: REPLACE },
             ]),
-            FirstSpiritManagedPage.integrateFsDrivenPagesIntoSapSkeleton('homepage', PageType.CONTENT_PAGE, 'MyFirstSpiritDrivenPageTemplate', [
-              { name: 'Section1', mergeStrategy: REPLACE },
-            ]),
+            FirstSpiritManagedPage.integrateFsDrivenPagesIntoSapSkeleton(
+              'homepage',
+              PageType.CONTENT_PAGE,
+              'MyFirstSpiritDrivenPageTemplate',
+              [{ name: 'Section1', mergeStrategy: REPLACE }]
+            ),
           ],
-        }
-      }
+        },
+      },
     };
     TestBed.configureTestingModule({
-      providers: [
-        { provide: BaseSiteService, useClass: MockBaseSiteService },
-      ],
+      providers: [{ provide: BaseSiteService, useClass: MockBaseSiteService }],
     });
 
     const fsComponentWrapper = new FsCmsPageComponentInjector(FsEditingAreaComponent.TYPE_CODE);
     fsEditingAreaWrapperSpy = spyOn(fsComponentWrapper, 'addCmsPageComponents');
-    const baseSiteService = TestBed.inject(BaseSiteService)
+    const baseSiteService = TestBed.inject(BaseSiteService);
     fsEditingAreaPipelineStep = new FsEditingAreaInjectorPipelineStep(fsComponentWrapper, fsSpartacusBridgeConfig, baseSiteService);
   });
 

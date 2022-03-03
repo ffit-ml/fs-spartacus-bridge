@@ -26,12 +26,12 @@ describe('NavigationMessageEventHandlerService', () => {
       imports: [RouterTestingModule],
       providers: [
         { provide: PreviewPageService, useClass: MockPreviewPageService },
-        { provide: WindowRef, useClass: MockWindowRef }
+        { provide: WindowRef, useClass: MockWindowRef },
       ],
     });
 
     spyOn(console, 'error').and.callThrough();
-    mockWindowRef = TestBed.inject(WindowRef)
+    mockWindowRef = TestBed.inject(WindowRef);
   });
 
   it('should add event listener on initialization', () => {

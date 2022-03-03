@@ -20,7 +20,6 @@ import { findDocumentsInCaasResponse } from '../../util/helper';
   providedIn: 'root',
 })
 export class TppEventHandlerService {
-
   constructor(
     private tppWrapperService: TppWrapperService,
     private previewPageService: PreviewPageService,
@@ -58,7 +57,7 @@ export class TppEventHandlerService {
               // via the CC, because we don't call the function tppWrapperService.setHybrisPageId() in this case. If the
               // hybrisPageId equals the elementStatus.uid, then we assume that we just created a new page using the CC.
               // Since it takes a few seconds for this page to be available in the CaaS, we call this.fetchPageFromCaas() for this case.
-              // This function tries to fetch the page in the CaaS several times. If it is found, it navigates to it.
+              // This function tries to fetch the page in the CaaS. If it is found, it navigates to it.
               // Otherwise, an error message is displayed.
               if (hybrisPageId === elementStatus.uid) {
                 const caasResult = (await this.fetchPageFromCaas(hybrisPageId)) as FsCmsPageInterface;
@@ -73,7 +72,13 @@ export class TppEventHandlerService {
                   this.tppWrapperService.showEditDialog(previewId);
                 }
               }
-              if ((await this.previewPageService.navigateTo(hybrisPageId)) !== true) {
+              let currentElementStatus;
+              let currentHybrisPageId;
+              if (currentPreviewId) {
+                currentElementStatus = await this.tppWrapperService.getElementStatus(currentPreviewId);
+                currentHybrisPageId = await this.tppWrapperService.getHybrisPageId(currentElementStatus.uid);
+              }
+              if (currentHybrisPageId !== hybrisPageId && (await this.previewPageService.navigateTo(hybrisPageId)) !== true) {
                 console.warn(`Could not navigate to the element with previewId '${previewId}' (hybris page id '${hybrisPageId}')`);
                 showPageNotAvailableErrorMessage();
               }
@@ -89,6 +94,10 @@ export class TppEventHandlerService {
               elementStatusString: JSON.stringify(elementStatus),
             });
           }
+          // Set the new Preview Id and change Language.
+          await this.tppWrapperService.setPreviewElement(previewId);
+          const lang = await this.tppWrapperService.getPreviewLanguage();
+          this.languageService.setActive(lang.toLocaleLowerCase());
         }
       });
     });
@@ -100,8 +109,8 @@ export class TppEventHandlerService {
     return combineLatest([caasClientFactoryObservable, activeLanguageObservable])
       .pipe(
         switchMap(([caasClient, lang]) => caasClient.getByUid(pageUid, lang)),
-        map(caasResponse => findDocumentsInCaasResponse(caasResponse)[0]),
-        first(),
+        map((caasResponse) => findDocumentsInCaasResponse(caasResponse)[0]),
+        first()
       )
       .toPromise()
       .catch(console.error);

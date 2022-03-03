@@ -57,9 +57,10 @@ export class FsEditingOverlayInjectorPipelineStep implements PipelineStep {
 
   private findFirstSpiritManagedPage(occCmsPage: CmsStructureModel, fsCmsPage: CmsStructureModel) {
     let baseSite;
-    this.baseSiteService.getActive().pipe(first()).subscribe(
-      activeBaseSite => baseSite = activeBaseSite
-    );
+    this.baseSiteService
+      .getActive()
+      .pipe(first())
+      .subscribe((activeBaseSite) => (baseSite = activeBaseSite));
     return getFsManagedPageConfigByTemplateId(
       this.fsSpartacusBridgeConfig.bridge[baseSite].firstSpiritManagedPages,
       this.tryGetPageTemplate(occCmsPage) || this.tryGetPageTemplate(fsCmsPage)

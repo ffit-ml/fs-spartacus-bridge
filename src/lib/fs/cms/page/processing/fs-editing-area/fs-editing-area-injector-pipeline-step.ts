@@ -23,7 +23,7 @@ export class FsEditingAreaInjectorPipelineStep implements PipelineStep {
     private fsComponentInjector: FsCmsPageComponentInjector,
     private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig,
     private baseSiteService: BaseSiteService
-    ) {}
+  ) {}
 
   /**
    * This methode injects the editing area to a content slot if it is empty.
@@ -72,9 +72,10 @@ export class FsEditingAreaInjectorPipelineStep implements PipelineStep {
 
   private findFirstSpiritManagedPage(occCmsPage: CmsStructureModel, fsCmsPage: CmsStructureModel) {
     let baseSite;
-    this.baseSiteService.getActive().pipe(first()).subscribe(
-      activeBaseSite => baseSite = activeBaseSite
-    );
+    this.baseSiteService
+      .getActive()
+      .pipe(first())
+      .subscribe((activeBaseSite) => (baseSite = activeBaseSite));
     return getFsManagedPageConfigByTemplateId(
       this.fsSpartacusBridgeConfig.bridge[baseSite].firstSpiritManagedPages,
       this.tryGetPageTemplate(occCmsPage) || this.tryGetPageTemplate(fsCmsPage)
@@ -109,7 +110,8 @@ export class FsEditingAreaInjectorPipelineStep implements PipelineStep {
  * @return {FsEditingAreaInjectorPipelineStep} The created FsEditingAreaInjectorPipelineStep instance.
  */
 export function createFsEditingAreaInjectorPipelineStep(
-  fsSpartacusBridgeConfig: FsSpartacusBridgeConfig, baseSiteService: BaseSiteService
+  fsSpartacusBridgeConfig: FsSpartacusBridgeConfig,
+  baseSiteService: BaseSiteService
 ): FsEditingAreaInjectorPipelineStep {
   const fsComponentInjector: FsCmsPageComponentInjector = new FsCmsPageComponentInjector(FsEditingAreaComponent.TYPE_CODE);
   return new FsEditingAreaInjectorPipelineStep(fsComponentInjector, fsSpartacusBridgeConfig, baseSiteService);

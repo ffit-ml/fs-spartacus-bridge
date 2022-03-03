@@ -23,7 +23,7 @@ export class FsCmsPageLanguageFallbackReplacer implements Converter<FsCmsPageInt
     private caasClientFactory: CaasClientFactory,
     private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig,
     private baseSiteService: BaseSiteService
-    ) {}
+  ) {}
 
   convert(source: FsCmsPageInterface | null | undefined): Observable<FsCmsPageInterface> {
     // null is a valid value for source, because it indicates,
@@ -33,10 +33,14 @@ export class FsCmsPageLanguageFallbackReplacer implements Converter<FsCmsPageInt
     }
 
     let baseSite;
-    this.baseSiteService.getActive().pipe(first()).subscribe(
-      activeBaseSite => baseSite = activeBaseSite
-    );
-    if (this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage && this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage !== '') {
+    this.baseSiteService
+      .getActive()
+      .pipe(first())
+      .subscribe((activeBaseSite) => (baseSite = activeBaseSite));
+    if (
+      this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage &&
+      this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage !== ''
+    ) {
       this.fallbackLanguage = this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage.substring(0, 2);
     } else {
       // if no fallback language is configured in the bridge config return the source because no section can be replaced

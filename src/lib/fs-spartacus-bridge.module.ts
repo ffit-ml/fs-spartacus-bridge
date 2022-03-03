@@ -55,10 +55,7 @@ export class FsSpartacusBridgeModule {
   static withConfig(config: FsSpartacusBridgeConfig): ModuleWithProviders<FsSpartacusBridgeModule> {
     return {
       ngModule: FsSpartacusBridgeModule,
-      providers: [
-        { provide: FsSpartacusBridgeConfig, useExisting: Config },
-        provideConfig(config),
-      ],
+      providers: [{ provide: FsSpartacusBridgeConfig, useExisting: Config }, provideConfig(config)],
     };
   }
 }

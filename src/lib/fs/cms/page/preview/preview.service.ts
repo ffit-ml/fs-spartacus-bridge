@@ -88,10 +88,14 @@ export class PreviewService {
   async createPage(pageUid: string, pageTemplate: string, pageType: PageType): Promise<CreatePageResult | undefined> {
     if (pageTemplate != null && pageUid != null && pageType != null) {
       let baseSite;
-      this.baseSiteService.getActive().pipe(first()).subscribe(
-        activeBaseSite => baseSite = activeBaseSite
+      this.baseSiteService
+        .getActive()
+        .pipe(first())
+        .subscribe((activeBaseSite) => (baseSite = activeBaseSite));
+      const fsPageConfig = getFsManagedPageConfigByTemplateId(
+        this.fsSpartacusBridgeConfig.bridge[baseSite].firstSpiritManagedPages,
+        pageTemplate
       );
-      const fsPageConfig = getFsManagedPageConfigByTemplateId(this.fsSpartacusBridgeConfig.bridge[baseSite].firstSpiritManagedPages, pageTemplate);
       console.log(`Found the following configuration for the occ template id '${pageTemplate}': '${JSON.stringify(fsPageConfig)}'`);
       if (fsPageConfig != null) {
         const fsPageTypeMapping = await this.tppWrapperService.getFsPageTypeMapping(pageType, pageTemplate);

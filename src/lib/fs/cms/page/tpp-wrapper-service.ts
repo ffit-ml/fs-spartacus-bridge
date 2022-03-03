@@ -1,12 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FsCmsPageInterface } from './fs-cms-page.interface';
 import { TppLoaderService } from './tpp-loader.service';
-import {
-  CreatePageOptions, CreatePageResult,
-  CreateSectionOptions,
-  CreateSectionResult,
-  Status
-} from './fs-tpp-api.data';
+import { CreatePageOptions, CreatePageResult, CreateSectionOptions, CreateSectionResult, Status } from './fs-tpp-api.data';
 
 export interface PageTypeMappingResult {
   fsTemplate: string;
@@ -27,9 +22,7 @@ export interface PageTypeMappingResult {
 export class TppWrapperService {
   private TPP_SNAP = this.tppLoaderService.getSnap();
 
-  constructor(
-    private tppLoaderService: TppLoaderService
-  ) {}
+  constructor(private tppLoaderService: TppLoaderService) {}
 
   async getFsPageTypeMapping(pageType: string, pageTemplate: string): Promise<PageTypeMappingResult | undefined> {
     console.log(`Execute the script 'page_type_mapping' with the parameters pageType = '${pageType}' and pageTemplate = '${pageTemplate}'`);
@@ -119,6 +112,11 @@ export class TppWrapperService {
 
   async enableCaasMode(previewCollection: string, apiKey: string, options?: { updateTimeout?: number }): Promise<void> {
     const snap = await this.TPP_SNAP;
-    snap.enableCaasMode(previewCollection, apiKey, options)
+    snap.enableCaasMode(previewCollection, apiKey, options);
+  }
+
+  async getPreviewLanguage(): Promise<string> {
+    const snap = await this.TPP_SNAP;
+    return snap.getPreviewLanguage();
   }
 }

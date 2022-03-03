@@ -57,22 +57,24 @@ export class CaasForbiddenHandler extends HttpErrorHandler {
    * @memberof CaasForbiddenHandler
    */
   handleError(request: HttpRequest<any>, errorResponse: HttpErrorResponse): void {
-    this.tppStatusService.isFirstSpiritPreview().pipe(
-      take(1)
-    ).subscribe((previewMode: boolean) => {
-      if (this.isCaasRequest(request)) {
-        this.handleCaasError(previewMode);
-      } else {
-        this.handleNonCaasError();
-      }
-    });
+    this.tppStatusService
+      .isFirstSpiritPreview()
+      .pipe(take(1))
+      .subscribe((previewMode: boolean) => {
+        if (this.isCaasRequest(request)) {
+          this.handleCaasError(previewMode);
+        } else {
+          this.handleNonCaasError();
+        }
+      });
   }
 
   private isCaasRequest(request: HttpRequest<any>) {
     let baseSite;
-    this.baseSiteService.getActive().pipe(first()).subscribe(
-      activeBaseSite => baseSite = activeBaseSite
-    );
+    this.baseSiteService
+      .getActive()
+      .pipe(first())
+      .subscribe((activeBaseSite) => (baseSite = activeBaseSite));
     return request && request.url.includes(this.fsSpartacusBridgeConfig.bridge[baseSite].caas.baseUrl);
   }
 

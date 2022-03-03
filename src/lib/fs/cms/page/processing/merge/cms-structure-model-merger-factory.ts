@@ -15,9 +15,10 @@ import { first } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class CmsStructureModelMergerFactory {
-  constructor(private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig,
-              private baseSiteService: BaseSiteService,
-              private injector: Injector
+  constructor(
+    private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig,
+    private baseSiteService: BaseSiteService,
+    private injector: Injector
   ) {}
 
   /**
@@ -30,11 +31,13 @@ export class CmsStructureModelMergerFactory {
    */
   createFsCmsPageMerger(pageTemplate: string): CmsStructureModelMerger | undefined {
     let baseSite;
-    this.baseSiteService.getActive().pipe(first()).subscribe(
-      activeBaseSite => baseSite = activeBaseSite
-    );
+    this.baseSiteService
+      .getActive()
+      .pipe(first())
+      .subscribe((activeBaseSite) => (baseSite = activeBaseSite));
     const firstSpiritManagedPage = getFsManagedPageConfigByTemplateId(
-      this.fsSpartacusBridgeConfig.bridge[baseSite].firstSpiritManagedPages, pageTemplate
+      this.fsSpartacusBridgeConfig.bridge[baseSite].firstSpiritManagedPages,
+      pageTemplate
     );
     return firstSpiritManagedPage ? new CmsStructureModelMerger(firstSpiritManagedPage, this.injector) : undefined;
   }

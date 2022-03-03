@@ -18,14 +18,12 @@ describe('CaasCollectionClientFactory', () => {
             test: {
               caas: { baseUrl: 'https://baseUrl', project: 'project', apiKey: 'apiKey', tenantId: 'defaultTenant' },
               firstSpiritManagedPages: [],
-            }
-          }
+            },
+          },
         }),
         ConfigModule.forRoot(),
       ],
-      providers: [
-        { provide: BaseSiteService, useClass: MockBaseSiteService }
-      ]
+      providers: [{ provide: BaseSiteService, useClass: MockBaseSiteService }],
     });
   });
 

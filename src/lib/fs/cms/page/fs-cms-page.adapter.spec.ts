@@ -55,8 +55,8 @@ describe('FsCmsPageAdapter', () => {
                 tenantId: 'defaultTenant',
               },
               firstSpiritManagedPages: [],
-            }
-          }
+            },
+          },
         }),
         ConfigModule.forRoot(),
       ],
@@ -64,7 +64,7 @@ describe('FsCmsPageAdapter', () => {
         { provide: LanguageService, useFactory: languageServiceFactory('de') },
         { provide: CaasClientFactory, useFactory: caasClientFactory(caasClient) },
         { provide: FS_CMS_PAGE_PREPARER, useClass: MockPreparer, multi: true },
-        { provide: BaseSiteService, useClass: MockBaseSiteService }
+        { provide: BaseSiteService, useClass: MockBaseSiteService },
       ],
     });
   });

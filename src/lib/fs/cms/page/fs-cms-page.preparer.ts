@@ -24,7 +24,7 @@ export class FsCmsPagePreparer implements Converter<FsCmsPageInterface, Observab
   constructor(
     private caasClientFactory: CaasClientFactory,
     private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig,
-    private baseSiteService: BaseSiteService,
+    private baseSiteService: BaseSiteService
   ) {}
 
   convert(source: FsCmsPageInterface | null | undefined): Observable<FsCmsPageInterface> {
@@ -35,10 +35,14 @@ export class FsCmsPagePreparer implements Converter<FsCmsPageInterface, Observab
     }
 
     let baseSite;
-    this.baseSiteService.getActive().pipe(first()).subscribe(
-      activeBaseSite => baseSite = activeBaseSite
-    );
-    if (this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage && this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage !== '') {
+    this.baseSiteService
+      .getActive()
+      .pipe(first())
+      .subscribe((activeBaseSite) => (baseSite = activeBaseSite));
+    if (
+      this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage &&
+      this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage !== ''
+    ) {
       this.fallbackLocale = this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage;
     }
 
@@ -209,13 +213,13 @@ export class FsCmsPagePreparer implements Converter<FsCmsPageInterface, Observab
   }
 
   private deepSearchForDatasetInputComponents(element: Value, addIdentifier2Map: (identifier: string, content: any) => void) {
-    const shouldTerminate = this.collectDatasetInputComponents(element, addIdentifier2Map)
+    const shouldTerminate = this.collectDatasetInputComponents(element, addIdentifier2Map);
     if (!shouldTerminate && typeof element === 'object') {
       Object.values(element).forEach((elementChild: Value) => {
-        if(elementChild) {
+        if (elementChild) {
           this.deepSearchForDatasetInputComponents(elementChild, addIdentifier2Map);
         }
-      })
+      });
     }
   }
 

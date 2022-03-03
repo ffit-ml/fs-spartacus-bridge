@@ -98,15 +98,15 @@ describe('FsCmsPagePreparer', () => {
                 tenantId: 'defaultTenant',
               },
               firstSpiritManagedPages: [],
-            }
-          }
+            },
+          },
         }),
         ConfigModule.forRoot(),
       ],
       providers: [
         { provide: LanguageService, useFactory: languageServiceFactory('de') },
         { provide: CaasClientFactory, useFactory: caasClientFactory(caasClient) },
-        { provide: BaseSiteService, useClass: MockBaseSiteService}
+        { provide: BaseSiteService, useClass: MockBaseSiteService },
       ],
     });
   });
@@ -229,15 +229,15 @@ describe('FsCmsPagePreparer', () => {
                   tenantId: 'defaultTenant',
                 },
                 firstSpiritManagedPages: [],
-              }
-            }
+              },
+            },
           }),
           ConfigModule.forRoot(),
         ],
         providers: [
           { provide: LanguageService, useFactory: languageServiceFactory('de') },
           { provide: CaasClientFactory, useFactory: caasClientFactory(caasClient) },
-          { provide: BaseSiteService, useClass: MockBaseSiteService}
+          { provide: BaseSiteService, useClass: MockBaseSiteService },
         ],
       });
     });

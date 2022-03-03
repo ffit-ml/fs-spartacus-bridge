@@ -40,15 +40,15 @@ describe('Helper', () => {
       imports: [
         FsSpartacusBridgeModule.withConfig({
           bridge: {
-            test : {
+            test: {
               caas: { baseUrl: 'https://caas', project: 'project', apiKey: 'apiKey', tenantId: 'defaultTenant' },
               firstSpiritManagedPages: [
                 FirstSpiritManagedPage.enhanceSapPages('OtherLandingPage2Template', [{ name: 'bottomheaderslot', mergeStrategy: REPLACE }]),
                 FirstSpiritManagedPage.enhanceSapPages('MyCustomOccTemplate', [{ name: 'bottomheaderslot', mergeStrategy: REPLACE }]),
                 FirstSpiritManagedPage.enhanceSapPages('LandingPage2Template', [{ name: 'bottomheaderslot', mergeStrategy: REPLACE }]),
               ],
-            }
-          }
+            },
+          },
         }),
         ConfigModule.forRoot(),
       ],
@@ -59,29 +59,31 @@ describe('Helper', () => {
   describe('should find the correct page configuration of the bridge for a given OCC template', () => {
     it('in any case (matching, lower, upper)', () => {
       const fsSpartacusBridgeConfig: FsSpartacusBridgeConfig = TestBed.inject(FsSpartacusBridgeConfig);
-      expect(getFsManagedPageConfigByTemplateId(fsSpartacusBridgeConfig.bridge["test"].firstSpiritManagedPages, 'LandingPage2Template')).toEqual(
-        firstManagedPage
-      );
-      expect(getFsManagedPageConfigByTemplateId(fsSpartacusBridgeConfig.bridge["test"].firstSpiritManagedPages, 'landingpage2template')).toEqual(
-        firstManagedPage
-      );
-      expect(getFsManagedPageConfigByTemplateId(fsSpartacusBridgeConfig.bridge["test"].firstSpiritManagedPages, 'LANDINGPAGE2TEMPLATE')).toEqual(
-        firstManagedPage
-      );
+      expect(
+        getFsManagedPageConfigByTemplateId(fsSpartacusBridgeConfig.bridge['test'].firstSpiritManagedPages, 'LandingPage2Template')
+      ).toEqual(firstManagedPage);
+      expect(
+        getFsManagedPageConfigByTemplateId(fsSpartacusBridgeConfig.bridge['test'].firstSpiritManagedPages, 'landingpage2template')
+      ).toEqual(firstManagedPage);
+      expect(
+        getFsManagedPageConfigByTemplateId(fsSpartacusBridgeConfig.bridge['test'].firstSpiritManagedPages, 'LANDINGPAGE2TEMPLATE')
+      ).toEqual(firstManagedPage);
     });
   });
 
   describe('should not return a page configuration', () => {
     it('if no configuration entry exists in the bridge for this OCC template', () => {
       const fsSpartacusBridgeConfig: FsSpartacusBridgeConfig = TestBed.inject(FsSpartacusBridgeConfig);
-      expect(getFsManagedPageConfigByTemplateId(fsSpartacusBridgeConfig.bridge["test"].firstSpiritManagedPages, 'UnknownPageTemplate')).toBeUndefined();
+      expect(
+        getFsManagedPageConfigByTemplateId(fsSpartacusBridgeConfig.bridge['test'].firstSpiritManagedPages, 'UnknownPageTemplate')
+      ).toBeUndefined();
     });
 
     it('if the OCC template is empty', () => {
       const fsSpartacusBridgeConfig: FsSpartacusBridgeConfig = TestBed.inject(FsSpartacusBridgeConfig);
-      expect(getFsManagedPageConfigByTemplateId(fsSpartacusBridgeConfig.bridge["test"].firstSpiritManagedPages, '')).toBeUndefined();
-      expect(getFsManagedPageConfigByTemplateId(fsSpartacusBridgeConfig.bridge["test"].firstSpiritManagedPages, null)).toBeUndefined();
-      expect(getFsManagedPageConfigByTemplateId(fsSpartacusBridgeConfig.bridge["test"].firstSpiritManagedPages, undefined)).toBeUndefined();
+      expect(getFsManagedPageConfigByTemplateId(fsSpartacusBridgeConfig.bridge['test'].firstSpiritManagedPages, '')).toBeUndefined();
+      expect(getFsManagedPageConfigByTemplateId(fsSpartacusBridgeConfig.bridge['test'].firstSpiritManagedPages, null)).toBeUndefined();
+      expect(getFsManagedPageConfigByTemplateId(fsSpartacusBridgeConfig.bridge['test'].firstSpiritManagedPages, undefined)).toBeUndefined();
     });
   });
 

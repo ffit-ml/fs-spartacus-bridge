@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class PreviewPageService {
-  static readonly HOMEPAGE_ID = "__HOMEPAGE__";
+  static readonly HOMEPAGE_ID = '__HOMEPAGE__';
   constructor(private ngZone: NgZone, private semanticPathService: SemanticPathService, private router: Router) {}
 
   private assembleUrl(hybrisPageId: string): string | null {
@@ -29,9 +29,7 @@ export class PreviewPageService {
       // In this case we'll assume this is the page's uid and try to navigate directly to it
       url = this.router.serializeUrl(this.router.parseUrl(this.addLeadingSlash(hybrisPageId)));
     } else if (sapPageId && sapPageId === PreviewPageService.HOMEPAGE_ID) {
-      url = this.router.serializeUrl(
-        this.router.createUrlTree(this.semanticPathService.transform({ cxRoute: 'homepage'}))
-      );
+      url = this.router.serializeUrl(this.router.createUrlTree(this.semanticPathService.transform({ cxRoute: 'homepage' })));
     } else if (sapPageId != null && sapPageType != null && sapPageId.length > 0 && sapPageType.length > 0) {
       switch (sapPageType) {
         case PageType.PRODUCT_PAGE:
