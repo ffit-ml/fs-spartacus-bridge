@@ -26,6 +26,7 @@ export class CaasClient {
    * @param {string} uid The UID of the page to get.
    * @param {string} language The language to get the page for.
    * @param {string} [altName] The alternative name to search for.
+   * @param {string} [country] The country to get the page for.
    * @return {Observable<any>} The requested page.
    * @memberof CaasClient
    */
@@ -66,6 +67,7 @@ export class CaasClient {
    * @param {string} uid The UID of the page.
    * @param {string} language The language to get the sections for.
    * @param {string} [altName] The alternative name to search for.
+   * @param {string} [country] The country to get the sections for.
    * @return {Observable<any>} The sections of the requested page.
    * @memberof CaasClient
    */
