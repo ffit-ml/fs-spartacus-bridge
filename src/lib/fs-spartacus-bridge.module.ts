@@ -12,6 +12,10 @@ import { FsSpartacusBridgeConfig, FsSpartacusCommonModule } from 'fs-spartacus-c
 import { COUNTRY_PROVIDER_TOKEN } from './fs/cms/page/fs-cms-page.adapter'
 import { CountryProvider } from '../types'
 
+/**
+ * Base Module of the Library that configures the processing of CMS page by importing
+ * {@link FsCmsPageModule} and sets up the error handlers
+ */
 @NgModule({
   declarations: [FsEditingOverlayComponent, FsEditingAreaComponent],
   imports: [

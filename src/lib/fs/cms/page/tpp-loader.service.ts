@@ -2,28 +2,25 @@ import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { SNAP } from './fs-tpp-api.data';
 
-
 @Injectable({
   providedIn: 'root',
 })
 export class TppLoaderService {
   private TPP_SNAP_PROMISE: Promise<SNAP> = this.loadTPP();
 
-  constructor(
-    @Inject(PLATFORM_ID) private platformId: string
-  ) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: string) {}
 
   async getSnap(): Promise<SNAP> | null {
     if (isPlatformBrowser(this.platformId)) {
-      return await this.TPP_SNAP_PROMISE
+      return await this.TPP_SNAP_PROMISE;
     }
   }
 
   private async loadTPP(): Promise<SNAP> | null {
-     if(isPlatformBrowser(this.platformId)) {
+    if (isPlatformBrowser(this.platformId)) {
       // tslint:disable
       return new Promise((resolve, reject) => {
-        window.addEventListener('message', function awaitTppPong({origin, data}) {
+        window.addEventListener('message', function awaitTppPong({ origin, data }) {
           if (typeof data === 'object' && 'tpp' in data && data.tpp._response && data.tpp._response.version) {
             window.removeEventListener('message', awaitTppPong);
             const version = data.tpp._response.version;
@@ -43,10 +40,10 @@ export class TppLoaderService {
             scpt.src = url;
           }
         });
-        window.top.postMessage({tpp: {ping: 1}}, '*');
+        window.top.postMessage({ tpp: { ping: 1 } }, '*');
       });
       //tslint: enable
     }
-    return null
+    return null;
   }
 }

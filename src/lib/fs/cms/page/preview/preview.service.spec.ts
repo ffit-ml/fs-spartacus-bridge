@@ -26,8 +26,8 @@ describe('PreviewService', () => {
                 FirstSpiritManagedPage.enhanceSapPages('MyCustomOccTemplate', [{ name: 'bottomheaderslot', mergeStrategy: REPLACE }]),
                 FirstSpiritManagedPage.enhanceSapPages('LandingPage2Template', [{ name: 'bottomheaderslot', mergeStrategy: REPLACE }]),
               ],
-            }
-          }
+            },
+          },
         }),
         ConfigModule.forRoot(),
       ],
@@ -59,8 +59,9 @@ describe('PreviewService', () => {
           },
         },
         {
-          provide: BaseSiteService, useClass: MockBaseSiteService
-        }
+          provide: BaseSiteService,
+          useClass: MockBaseSiteService,
+        },
       ],
     }).compileComponents();
   });

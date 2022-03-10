@@ -1,12 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FsCmsPageInterface } from './fs-cms-page.interface';
 import { TppLoaderService } from './tpp-loader.service';
-import {
-  CreatePageOptions, CreatePageResult,
-  CreateSectionOptions,
-  CreateSectionResult,
-  Status
-} from './fs-tpp-api.data';
+import { CreatePageOptions, CreatePageResult, CreateSectionOptions, CreateSectionResult, Status } from './fs-tpp-api.data';
 
 export interface PageTypeMappingResult {
   fsTemplate: string;
@@ -14,15 +9,20 @@ export interface PageTypeMappingResult {
   pageFolder: string;
 }
 
+/**
+ * This service wraps the fs-tpp-api/snap implementation into a typed one for a TypeScript accessible package.
+ * See the fs-tpp-api/snap [documentation]{@link https://docs.e-spirit.com/tpp/snap/} for more information.
+ *
+ * @export
+ * @class TppWrapperService
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class TppWrapperService {
   private TPP_SNAP = this.tppLoaderService.getSnap();
 
-  constructor(
-    private tppLoaderService: TppLoaderService
-  ) {}
+  constructor(private tppLoaderService: TppLoaderService) {}
 
   async getFsPageTypeMapping(pageType: string, pageTemplate: string): Promise<PageTypeMappingResult | undefined> {
     console.log(`Execute the script 'page_type_mapping' with the parameters pageType = '${pageType}' and pageTemplate = '${pageTemplate}'`);
@@ -108,5 +108,15 @@ export class TppWrapperService {
   async showEditDialog(previewId: string) {
     const snap = await this.TPP_SNAP;
     return snap?.showEditDialog(previewId);
+  }
+
+  async enableCaasMode(previewCollection: string, apiKey: string, options?: { updateTimeout?: number }): Promise<void> {
+    const snap = await this.TPP_SNAP;
+    snap.enableCaasMode(previewCollection, apiKey, options);
+  }
+
+  async getPreviewLanguage(): Promise<string> {
+    const snap = await this.TPP_SNAP;
+    return snap.getPreviewLanguage();
   }
 }

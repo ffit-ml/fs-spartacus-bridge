@@ -23,20 +23,19 @@ describe('CmsStructureModelMergerFactory', () => {
             test: {
               caas: { baseUrl: '', project: '', apiKey: '', tenantId: '' },
               firstSpiritManagedPages: [FirstSpiritManagedPage.enhanceSapPages('myOccTemplate', [])],
-            }
-          }
+            },
+          },
         }),
         ConfigModule.forRoot(),
       ],
       providers: [
         { provide: BaseSiteService, useClass: MockBaseSiteService },
-        { provide: Injector, useValue: { get: () => null } }
+        { provide: Injector, useValue: { get: () => null } },
       ],
     });
 
-    fsCmsPageMergerFactory = TestBed.inject(CmsStructureModelMergerFactory)
+    fsCmsPageMergerFactory = TestBed.inject(CmsStructureModelMergerFactory);
   });
-
 
   it('returns undefined, if a page is not managed by FirstSpirit, ', () => {
     const fsCmsPageMerger = fsCmsPageMergerFactory.createFsCmsPageMerger('myOtherTemplate');

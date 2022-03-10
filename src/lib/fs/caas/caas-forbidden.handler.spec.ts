@@ -26,8 +26,8 @@ describe('CaasForbiddenHandler', () => {
           project: '',
           tenantId: '',
         },
-      }
-    }
+      },
+    },
   };
 
   beforeEach(() => {
@@ -36,9 +36,9 @@ describe('CaasForbiddenHandler', () => {
       providers: [
         {
           provide: BaseSiteService,
-          useClass: MockBaseSiteService
-        }
-      ]
+          useClass: MockBaseSiteService,
+        },
+      ],
     });
     baseSiteService = TestBed.inject(BaseSiteService);
   });

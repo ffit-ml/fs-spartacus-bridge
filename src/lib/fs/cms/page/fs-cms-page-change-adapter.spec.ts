@@ -76,7 +76,7 @@ class MockTppWrapperService extends TppWrapperService {
     return of(false);
   }
 
-  async onRerenderView(handler: RerenderHandler) {
+  async onRerenderView(handler: RerenderHandler): Promise<void> {
     this.rerenderHandlers.push(handler);
   }
 
@@ -106,8 +106,8 @@ describe('FsCmsPageChangeAdapter', () => {
             test: {
               caas: { baseUrl: 'baseUrl', project: 'project', apiKey: 'apiKey', tenantId: 'defaultTenant' },
               firstSpiritManagedPages: [],
-            }
-          }
+            },
+          },
         }),
         ConfigModule.forRoot(),
       ],

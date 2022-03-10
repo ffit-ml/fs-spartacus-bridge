@@ -10,6 +10,11 @@ import { CountryProvider } from '../../../../types'
 
 export const COUNTRY_PROVIDER_TOKEN = new InjectionToken<CountryProvider>('CountryProvider')
 
+/**
+ * This class loads the FirstSpirit page data from the shop backend.
+ *
+ * @export
+ */
 @Injectable({
   providedIn: 'root',
 })

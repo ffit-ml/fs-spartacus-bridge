@@ -14,6 +14,11 @@ function getPageId(pageContext: PageContext): string | null | undefined {
   return extractCmsPageUid(pageContext.id);
 }
 
+/**
+ * This function retrieves both, the SAP Commerce UID and the FirstSpirit UID, and returns them.
+ * 
+ * @param pageContext The context of the page for which the UID will be retrieved.
+ */
 export function extractPageUniqueId(
   pageContext: PageContext
 ): { pageId: string | null | undefined; firstSpiritPageId: string | null | undefined } {

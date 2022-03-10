@@ -3,12 +3,26 @@ import { CmsStructureModel, PageType } from '@spartacus/core';
 import { Injectable } from '@angular/core';
 import { LayoutConfig, SlotConfig } from '@spartacus/storefront';
 
+/**
+ * This factory creates Face OCC CMS structure Models, which in turn enable FirstSpirit driven pages to be created.
+ * FirstSpirit driven pages do not exist in SAP Commerce.
+ *
+ * @export
+ * @class CmsStructureModelResponseFactory
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class CmsStructureModelResponseFactory {
   constructor(private storefrontConfig: LayoutConfig) {}
 
+  /**
+   * This method creates an OCC CmsStructureModel for a FirstSpirit page and
+   * returns "null" if no valid template is given or the given template has no slots defined.
+   *
+   * @param fsCmsPage The page for which an OCC CmsStructureModel needs to be created.
+   * @return The OCC CMS page that was created for the FirstSpirit page, null in case of an error.
+   */
   createCmsStructureModelResponse(fsCmsPage: CmsStructureModel): null | Observable<CmsStructureModel> {
     const fakeOccCmsPage: CmsStructureModel = {
       page: {

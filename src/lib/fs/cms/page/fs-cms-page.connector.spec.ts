@@ -16,7 +16,8 @@ import {
   PageContext,
   PageType,
   LanguageService,
-  TranslationService, BaseSiteService,
+  TranslationService,
+  BaseSiteService,
 } from '@spartacus/core';
 import { of, throwError, isObservable, Observable } from 'rxjs';
 
@@ -85,8 +86,8 @@ describe('FsCmsPageConnector', () => {
                   []
                 ),
               ],
-            }
-          }
+            },
+          },
         }),
         ConfigModule.forRoot(),
       ],

@@ -58,12 +58,12 @@ export interface CreateSectionResult {
   template:
     | string
     | {
-    fsType: string;
-    identifier: string;
-    name: string;
-    uid: string;
-    uidType?: string;
-  };
+        fsType: string;
+        identifier: string;
+        name: string;
+        uid: string;
+        uidType?: string;
+      };
   formData: { [key: string]: any };
   previewId?: string;
   name: string;
@@ -87,6 +87,8 @@ export interface SNAP {
   execute(identifier: string, params?: object, result?: boolean): Promise<any>;
   showEditDialog(previewId: string);
   overrideDefaultButton(defaultButtonName: string, buttonOverrides: Button | null): void;
+  enableCaasMode(previewCollection: string, apiKey: string, options?: { updateTimeout?: number }): void;
+  getPreviewLanguage(): Promise<string>;
 }
 
 export interface Button {

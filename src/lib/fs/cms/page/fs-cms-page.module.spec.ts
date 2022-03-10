@@ -9,7 +9,7 @@ import {
   ConfigModule,
   LanguageService,
   PageType,
-  TranslationService
+  TranslationService,
 } from '@spartacus/core';
 import { of } from 'rxjs';
 
@@ -47,8 +47,8 @@ describe('All components in the FsCmsPageModule', () => {
                   { name: 'new_fs_content_slot', mergeStrategy: REPLACE },
                 ]),
               ],
-            }
-          }
+            },
+          },
         }),
         ConfigModule.forRoot(),
       ],
@@ -58,7 +58,7 @@ describe('All components in the FsCmsPageModule', () => {
         { provide: LanguageService, useValue: { getActive: () => of('de') } },
         { provide: CmsStructureConfigService, useValue: {} },
         { provide: TppStatusService, useValue: { isFirstSpiritPreview: () => of(false), onRerenderView: () => {} } },
-        { provide: BaseSiteService, useClass: MockBaseSiteService }
+        { provide: BaseSiteService, useClass: MockBaseSiteService },
       ],
     });
   });

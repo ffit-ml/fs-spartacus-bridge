@@ -18,10 +18,12 @@ import Spy = jasmine.Spy;
 import { MockBaseSiteService } from './processing/merge/cms-structure-model-merger-factory.spec';
 
 const DEFAULT_UID = 'uid-123';
+const DEFAULT_SECOND_CALL_SUFFIX = 'uid-123';
 const DEFAULT_PAGE_NAME = 'TestPage';
 const DEFAULT_INITIAL_PREVIEW_ID = 'initial-preview-id';
 const DEFAULT_PREVIEW_ID = 'preview-id';
 const DEFAULT_PAGE_PREVIEW_ID = '4711';
+const DEFAULT_LANGUAGE = 'EN';
 
 @Injectable()
 class MockPreviewService extends PreviewService {
@@ -40,7 +42,7 @@ class MockTppWrapperService extends TppWrapperService {
     },
     tppLoaderService: TppLoaderService
   ) {
-    super(tppLoaderService)
+    super(tppLoaderService);
   }
   onRequestPreviewElementHandler: (previewId: string) => void;
 
@@ -54,8 +56,11 @@ class MockTppWrapperService extends TppWrapperService {
 
   getPreviewElement = createSpy('TppWrapperService.getPreviewElement').and.returnValue(Promise.resolve(DEFAULT_PAGE_PREVIEW_ID));
 
-  getHybrisPageId = createSpy('TppWrapperService.getHybrisPageId').and.callFake(
-    async (pageRefUid: string): Promise<string> => Promise.resolve(this.getHybrisPageIdResult)
+  setPreviewElement = createSpy('TppWrapperService.setPreviewElement').and.returnValue(Promise.resolve());
+
+  getHybrisPageId = createSpy('TppWrapperService.getHybrisPageId').and.returnValues(
+    Promise.resolve(this.getHybrisPageIdResult),
+    Promise.resolve(this.getHybrisPageIdResult + DEFAULT_SECOND_CALL_SUFFIX)
   );
 
   setHybrisPageId = createSpy('TppWrapperService.setHybrisPageId').and.callFake(
@@ -68,6 +73,8 @@ class MockTppWrapperService extends TppWrapperService {
     }
   );
 
+  getPreviewLanguage = createSpy('TppWrapperService.getPreviewLanguage').and.returnValue(Promise.resolve(DEFAULT_LANGUAGE));
+
   showEditDialog = createSpy('TppWrapperService.showEditDialog');
 
   triggerOnRequestPreviewElementHandler(previewId: string): void {
@@ -79,12 +86,12 @@ class MockTppWrapperService extends TppWrapperService {
   }
 }
 
-class MockTppLoaderService extends TppLoaderService{
+class MockTppLoaderService extends TppLoaderService {
   constructor() {
     super('test');
   }
   async getSnap(): Promise<SNAP> | null {
-    return null
+    return null;
   }
 }
 
@@ -125,6 +132,7 @@ function caasClientFactory(client) {
 function languageServiceFactory(language) {
   return () => ({
     getActive: () => of(language),
+    setActive: createSpy('LanguageService.setActive'),
   });
 }
 
@@ -138,11 +146,7 @@ describe('TppEventHandlerService', () => {
     initialPreviewId: string = DEFAULT_INITIAL_PREVIEW_ID,
     previewId: string = DEFAULT_PREVIEW_ID
   ): Promise<void> => {
-    expect((tppEventHandler as any).isFirstOnRequestPreviewElementCall).toBe(true);
     tppEventHandler.initialize();
-    expect((tppEventHandler as any).isFirstOnRequestPreviewElementCall).toBe(true);
-    (tppWrapperService as MockTppWrapperService).triggerOnRequestPreviewElementHandler(initialPreviewId);
-    expect((tppEventHandler as any).isFirstOnRequestPreviewElementCall).toBe(false);
     (tppWrapperService as MockTppWrapperService).triggerOnRequestPreviewElementHandler(previewId);
     return (ngZone as MockNgZone).onRequestPreviewElementHandler();
   };
@@ -161,23 +165,23 @@ describe('TppEventHandlerService', () => {
                 tenantId: 'defaultTenant',
               },
               firstSpiritManagedPages: [],
-            }
-          }
+            },
+          },
         }),
         ConfigModule.forRoot(),
       ],
       providers: [
-        { provide: LanguageService, useFactory: languageServiceFactory('en') },
+        { provide: LanguageService, useFactory: languageServiceFactory(DEFAULT_LANGUAGE.toLocaleLowerCase()) },
         { provide: CaasClientFactory, useFactory: caasClientFactory(caasClient) },
         {
-          provide: TppWrapperService, useValue:
-            new MockTppWrapperService(DEFAULT_UID, undefined, new MockTppLoaderService())
+          provide: TppWrapperService,
+          useValue: new MockTppWrapperService(DEFAULT_UID, undefined, new MockTppLoaderService()),
         },
         { provide: PreviewService, useClass: MockPreviewService },
         { provide: PreviewPageService, useClass: MockPreviewPageService },
         { provide: TranslationService, useValue: {} },
         { provide: NgZone, useClass: MockNgZone },
-        { provide: BaseSiteService, useClass: MockBaseSiteService }
+        { provide: BaseSiteService, useClass: MockBaseSiteService },
       ],
     });
   });
@@ -200,9 +204,7 @@ describe('TppEventHandlerService', () => {
 
   it('should navigate to a page that was requested via report', async () => {
     TestBed.overrideProvider(TppWrapperService, {
-      useValue: new MockTppWrapperService(
-        `ContentPage:${DEFAULT_UID}`, undefined, new MockTppLoaderService()
-      ),
+      useValue: new MockTppWrapperService(`ContentPage:${DEFAULT_UID}`, undefined, new MockTppLoaderService()),
     });
     const tppEventHandler = TestBed.inject(TppEventHandlerService);
     spyOn(tppEventHandler as any, 'fetchPageFromCaas').and.returnValue({ uid: DEFAULT_UID });
@@ -293,5 +295,19 @@ describe('TppEventHandlerService', () => {
       uid: DEFAULT_UID,
     });
     expect(previewPageService.navigateTo).not.toHaveBeenCalled();
+  });
+
+  it('should handle language changes via navigation', async () => {
+    const tppEventHandler = TestBed.inject(TppEventHandlerService);
+    spyOn(tppEventHandler as any, 'fetchPageFromCaas').and.returnValue({ uid: DEFAULT_UID });
+    const tppWrapperService = TestBed.inject(TppWrapperService);
+    const languageService = TestBed.inject(LanguageService);
+    const ngZone = TestBed.inject(NgZone);
+
+    await triggerOnRequestPreviewElementHandlerExecution(tppEventHandler, tppWrapperService, ngZone);
+    expect(tppWrapperService.getElementStatus).toHaveBeenCalledWith(DEFAULT_PREVIEW_ID);
+    expect(tppWrapperService.getPreviewLanguage).toHaveBeenCalled();
+    expect(tppWrapperService.setPreviewElement).toHaveBeenCalledWith(DEFAULT_PREVIEW_ID);
+    expect(languageService.setActive).toHaveBeenCalledWith(DEFAULT_LANGUAGE.toLocaleLowerCase());
   });
 });

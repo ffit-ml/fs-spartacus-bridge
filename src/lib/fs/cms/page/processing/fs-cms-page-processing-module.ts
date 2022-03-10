@@ -8,6 +8,13 @@ import { createFsEditingOverlayInjectorPipelineStep } from './fs-editing-overlay
 import { FsSpartacusBridgeConfig } from 'fs-spartacus-common';
 import { BaseSiteService } from '@spartacus/core';
 
+
+/**
+ * This module defines the merge strategies and configures the processing {@link Pipeline}.
+ *
+ * @export
+ * @class FsCmsPageProcessingModule
+ */
 @NgModule({
   providers: [
     CmsStructureModelMergerFactory,

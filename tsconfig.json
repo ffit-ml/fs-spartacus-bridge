@@ -23,7 +23,7 @@
     "paths": {
       "@angular/*": ["./node_modules/@angular/*"],
       "@spartacus/*": ["./node_modules/@spartacus/*"],
-      "fs-spartacus-common/*": ["./node_modules/fs-spartacus-common/*"],
+      "fs-spartacus-common/*": ["./node_modules/fs-spartacus-common/*"]
     }
   },
   "angularCompilerOptions": {

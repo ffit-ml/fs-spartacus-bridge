@@ -8,6 +8,11 @@ import { CaasClientFactory } from '../../caas/caas-client.factory';
 
 import { FsCmsPageInterface } from './fs-cms-page.interface';
 
+/**
+ * This converter prepares the data by replacing non-existent language specific data with the fallback language ones.
+ *
+ * @export
+ */
 @Injectable({ providedIn: 'root' })
 export class FsCmsPageLanguageFallbackReplacer implements Converter<FsCmsPageInterface, Observable<FsCmsPageInterface>> {
   private source: FsCmsPageInterface;
@@ -19,7 +24,7 @@ export class FsCmsPageLanguageFallbackReplacer implements Converter<FsCmsPageInt
     private caasClientFactory: CaasClientFactory,
     private fsSpartacusBridgeConfig: FsSpartacusBridgeConfig,
     private baseSiteService: BaseSiteService
-    ) {}
+  ) {}
 
   convert(source: FsCmsPageInterface | null | undefined): Observable<FsCmsPageInterface> {
     // null is a valid value for source, because it indicates,
@@ -29,10 +34,14 @@ export class FsCmsPageLanguageFallbackReplacer implements Converter<FsCmsPageInt
     }
 
     let baseSite;
-    this.baseSiteService.getActive().pipe(first()).subscribe(
-      activeBaseSite => baseSite = activeBaseSite
-    );
-    if (this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage && this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage !== '') {
+    this.baseSiteService
+      .getActive()
+      .pipe(first())
+      .subscribe((activeBaseSite) => (baseSite = activeBaseSite));
+    if (
+      this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage &&
+      this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage !== ''
+    ) {
       this.fallbackLanguage = this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage.substring(0, 2);
       this.fallbackCountry = this.fsSpartacusBridgeConfig.bridge[baseSite].fallbackLanguage.substring(3)
     } else {

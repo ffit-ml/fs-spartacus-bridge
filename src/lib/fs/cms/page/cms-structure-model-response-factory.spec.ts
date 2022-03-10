@@ -22,8 +22,8 @@ describe('CmsStructureModelResponseFactory', () => {
                 tenantId: '',
               },
               firstSpiritManagedPages: [FirstSpiritManagedPage.integrateFsDrivenPages('FirstSpiritDrivenPage', [])],
-            }
-          }
+            },
+          },
         }),
         ConfigModule.forRoot(),
       ],

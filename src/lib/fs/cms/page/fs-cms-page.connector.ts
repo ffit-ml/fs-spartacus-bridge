@@ -8,6 +8,12 @@ import { PipelineFactory } from './processing/pipeline-factory';
 import { FsCmsPageAdaptersFacade } from './fs-cms-page-adapters-facade';
 import { FsDrivenPageService } from './fs-driven-page-service';
 
+/**
+ * This class prepares the content from FirstSpirit and SAP Commerce and executes the {@link Pipeline}.
+ *
+ * @export
+ * @class FsCmsPageConnector
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -27,6 +33,12 @@ export class FsCmsPageConnector extends CmsPageConnector {
     this.pipeline = pipelineFactory.createPipeline();
   }
 
+  /**
+   * This method prepares the CMS data for display.
+   *
+   * @param pageContext The page for which the content should be prepared for.
+   * @return The page with the combined data from FirstSpirit and SAP Commerce.
+   */
   get(pageContext: PageContext): Observable<CmsStructureModel> {
     const occCmsPage$ = this.occCmsPageAdapter.load(pageContext);
     const fsCmsPage$ = this.fsCmsPageAdaptersFacade.load(pageContext);

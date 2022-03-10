@@ -1,12 +1,20 @@
 import { FsCmsPageInterface } from '../cms/page/fs-cms-page.interface';
-import { FirstSpiritManagedPage, arrayify, Optional } from 'fs-spartacus-common';
-import { throwError, iif, of, Observable } from 'rxjs';
-import { map, retryWhen, concatMap, delay, switchMap, tap } from 'rxjs/operators';
+import { arrayify, FirstSpiritManagedPage, FsSpartacusBridgeConfig, Optional } from 'fs-spartacus-common';
+import { iif, Observable, of, throwError } from 'rxjs';
+import { concatMap, delay, map, retryWhen, switchMap, tap } from 'rxjs/operators';
+import { CaasAccessData } from '../caas/caas-access-data';
+import { CaasCollection } from '../caas/caas-collection';
 
 const DEFAULT_INITIAL_DELAY = 500;
 const DEFAULT_RETRY_DELAY = 750;
 const DEFAULT_MAX_RETRIES = 4;
 
+/**
+ * This function retrieves the FirstSpiritManagedPage from the given config by the given ID of the template and returns it.
+ *
+ * @param fsManagedPagesConfig The FirstSpirit Managed Pages config.
+ * @param templateId The ID of the template for which to look for.
+ */
 export function getFsManagedPageConfigByTemplateId(
   fsManagedPagesConfig: FirstSpiritManagedPage[],
   templateId: string
@@ -15,6 +23,13 @@ export function getFsManagedPageConfigByTemplateId(
   return fsManagedPagesConfig.find((managedPage) => transformCase(managedPage.template) === transformCase(templateId));
 }
 
+/**
+ * This function checks for FirstSpirit CMS pages in a given CaaS response and returns them.
+ *
+ * @export
+ * @param response CaaS response to parse for pages.
+ * @return The pages found in the CaaS response.
+ */
 export function findDocumentsInCaasResponse(response: any): FsCmsPageInterface[] {
   if (response?._embedded?.['rh:doc'] && Array.isArray(response._embedded['rh:doc'])) {
     return arrayify(response._embedded['rh:doc'] as FsCmsPageInterface[]);
@@ -106,4 +121,14 @@ export function reExecutable<T extends (...args: any[]) => Observable<any>, S ex
         )
       )
     );
+}
+
+export function createCaasAccessData(config: FsSpartacusBridgeConfig, baseSite: string, isPreview: boolean) {
+  return new CaasAccessData(
+    config.bridge[baseSite].caas.baseUrl,
+    config.bridge[baseSite].caas.tenantId,
+    config.bridge[baseSite].caas.project,
+    isPreview ? CaasCollection.PREVIEW_CONTENT : CaasCollection.RELEASE_CONTENT,
+    config.bridge[baseSite].caas.apiKey
+  );
 }

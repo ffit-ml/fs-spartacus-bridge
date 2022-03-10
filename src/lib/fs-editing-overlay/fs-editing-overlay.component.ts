@@ -10,6 +10,9 @@ import { PreviewService } from '../fs/cms/page/preview/preview.service';
 import { extractPageUniqueId } from '../fs/util/occ-cms-pages';
 import { CreatePageResult } from '../fs/cms/page/fs-tpp-api.data';
 
+/**
+ * This overlay component marks empty slots in that content can be added.
+ */
 @Component({
   selector: 'fs-fs-editing-overlay',
   templateUrl: './fs-editing-overlay.component.html',
@@ -46,7 +49,7 @@ export class FsEditingOverlayComponent implements OnDestroy {
   );
 
   ngOnDestroy(): void {
-    if(this.subs$) {
+    if (this.subs$) {
       this.subs$.unsubscribe();
     }
   }
@@ -105,30 +108,34 @@ export class FsEditingOverlayComponent implements OnDestroy {
   async addContent(): Promise<void> {
     if (!this.isButtonDisabled) {
       this.isButtonDisabled = true;
-      this.subs$.add(this.getLatestPagePreviewData().subscribe(async (pagePreviewData) => {
-        const [previewElement, componentDataAndPage] = nullSafe(pagePreviewData, []);
-        const [componentData, page, routerState] = nullSafe(componentDataAndPage, []);
-        if (await this.previewService.isFirstSpiritManagedPage(previewElement)) {
-          await this.createSection(previewElement, componentData);
-        } else {
-          const createPageResult = (await this.createPage(page, routerState)) as CreatePageResult;
-          if (createPageResult != null && createPageResult.identifier != null) {
-            const { uid, identifier, displayname, name } = createPageResult;
-            console.log(
-              `Successfully created the page '${displayname || name}' (template: ${page.template}, uid: ${uid}, identifier: ${identifier})`
-            );
-            const hybrisPageId = `${routerState.state.context.type || PageType.CONTENT_PAGE}:${routerState.state.context.id}`;
-            await this.tppWrapperService.setHybrisPageId(uid, hybrisPageId);
-            await this.tppWrapperService.setPreviewElement(identifier);
-            await this.tppWrapperService.triggerRerenderView();
-            await this.createSection(identifier, componentData);
+      this.subs$.add(
+        this.getLatestPagePreviewData().subscribe(async (pagePreviewData) => {
+          const [previewElement, componentDataAndPage] = nullSafe(pagePreviewData, []);
+          const [componentData, page, routerState] = nullSafe(componentDataAndPage, []);
+          if (await this.previewService.isFirstSpiritManagedPage(previewElement)) {
+            await this.createSection(previewElement, componentData);
           } else {
-            console.log('The creation of the page was cancelled.');
+            const createPageResult = (await this.createPage(page, routerState)) as CreatePageResult;
+            if (createPageResult != null && createPageResult.identifier != null) {
+              const { uid, identifier, displayname, name } = createPageResult;
+              console.log(
+                `Successfully created the page '${displayname || name}' (template: ${
+                  page.template
+                }, uid: ${uid}, identifier: ${identifier})`
+              );
+              const hybrisPageId = `${routerState.state.context.type || PageType.CONTENT_PAGE}:${routerState.state.context.id}`;
+              await this.tppWrapperService.setHybrisPageId(uid, hybrisPageId);
+              await this.tppWrapperService.setPreviewElement(identifier);
+              await this.tppWrapperService.triggerRerenderView();
+              await this.createSection(identifier, componentData);
+            } else {
+              console.log('The creation of the page was cancelled.');
+            }
           }
-        }
-        this.isButtonDisabled = false;
-        this.changeDetectorRef.detectChanges();
-      }));
+          this.isButtonDisabled = false;
+          this.changeDetectorRef.detectChanges();
+        })
+      );
     }
   }
 }

@@ -2,11 +2,17 @@
 import { SemanticPathService, PageType } from '@spartacus/core';
 import { Router } from '@angular/router';
 
+/**
+ * This service handles the URL creation and the navigation for the preview within the ContentCreator.
+ *
+ * @export
+ * @class PreviewPageService
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class PreviewPageService {
-  static readonly HOMEPAGE_ID = "__HOMEPAGE__";
+  static readonly HOMEPAGE_ID = '__HOMEPAGE__';
   constructor(private ngZone: NgZone, private semanticPathService: SemanticPathService, private router: Router) {}
 
   private assembleUrl(hybrisPageId: string): string | null {
@@ -23,9 +29,7 @@ export class PreviewPageService {
       // In this case we'll assume this is the page's uid and try to navigate directly to it
       url = this.router.serializeUrl(this.router.parseUrl(this.addLeadingSlash(hybrisPageId)));
     } else if (sapPageId && sapPageId === PreviewPageService.HOMEPAGE_ID) {
-      url = this.router.serializeUrl(
-        this.router.createUrlTree(this.semanticPathService.transform({ cxRoute: 'homepage'}))
-      );
+      url = this.router.serializeUrl(this.router.createUrlTree(this.semanticPathService.transform({ cxRoute: 'homepage' })));
     } else if (sapPageId != null && sapPageType != null && sapPageId.length > 0 && sapPageType.length > 0) {
       switch (sapPageType) {
         case PageType.PRODUCT_PAGE:
@@ -53,6 +57,13 @@ export class PreviewPageService {
     return url?.startsWith('/') ? `${url}` : `/${url}`;
   }
 
+  /**
+   * This method navigates the preview to a SAP Commerce page by a given ID.
+   *
+   * @param {string} hybrisPageId The ID of the SAP Commerce page to navigate the preview to.
+   * @return {Promise<boolean>} Promise to resolve with whether the navigation was successful.
+   * @memberof PreviewPageService
+   */
   async navigateTo(hybrisPageId: string): Promise<boolean> {
     const url = this.assembleUrl(hybrisPageId);
     if (url != null) {

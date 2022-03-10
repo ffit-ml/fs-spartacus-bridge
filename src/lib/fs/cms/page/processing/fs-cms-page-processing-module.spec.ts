@@ -22,8 +22,9 @@ describe('FsCmsPageProcessingModule', () => {
           } as FsSpartacusBridgeConfig,
         },
         {
-          provide: BaseSiteService, useClass: MockBaseSiteService
-        }
+          provide: BaseSiteService,
+          useClass: MockBaseSiteService,
+        },
       ],
     });
   });

@@ -4,18 +4,22 @@ import { FsCmsPageInterface } from './fs-cms-page.interface';
 import { TppWrapperService } from './tpp-wrapper-service';
 import { Injectable, NgZone } from '@angular/core';
 import { CaasClientFactory } from '../../caas/caas-client.factory';
-import { combineLatest, iif, throwError, of } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { LanguageService, PageType } from '@spartacus/core';
-import { take, switchMap, first } from 'rxjs/operators';
+import { first, map, switchMap, take } from 'rxjs/operators';
 import { PreviewPageService } from './preview/preview-page.service';
-import { findDocumentsInCaasResponse, reExecutable, bind } from '../../util/helper';
+import { findDocumentsInCaasResponse } from '../../util/helper';
 
+/**
+ * This service handles events fired by the fs-tpp-api/snap implementation.
+ *
+ * @export
+ * @class TppEventHandlerService
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class TppEventHandlerService {
-  private isFirstOnRequestPreviewElementCall: boolean;
-
   constructor(
     private tppWrapperService: TppWrapperService,
     private previewPageService: PreviewPageService,
@@ -23,20 +27,13 @@ export class TppEventHandlerService {
     private caasClientFactory: CaasClientFactory,
     private ngZone: NgZone,
     private previewService: PreviewService
-  ) {
-    this.isFirstOnRequestPreviewElementCall = true;
-  }
+  ) {}
 
+  /**
+   * This method initializes the listening on the RequestPreviewElement event.
+   */
   initialize() {
     this.tppWrapperService.onRequestPreviewElement((previewId: string) => {
-      // TPP_SNAP calls the onRequestPreviewElement() event handler regardless of whether it is the
-      // initial page load, the creation of a page or the click on a report item.
-      // Since we want to ignore this initial call, we need to store whether the handler has been
-      // called once since the service was created
-      if (this.isFirstOnRequestPreviewElementCall) {
-        this.isFirstOnRequestPreviewElementCall = false;
-        return;
-      }
       this.ngZone.run(async () => {
         const currentPreviewId = await this.tppWrapperService.getPreviewElement();
         if (previewId != null && currentPreviewId !== previewId) {
@@ -60,7 +57,7 @@ export class TppEventHandlerService {
               // via the CC, because we don't call the function tppWrapperService.setHybrisPageId() in this case. If the
               // hybrisPageId equals the elementStatus.uid, then we assume that we just created a new page using the CC.
               // Since it takes a few seconds for this page to be available in the CaaS, we call this.fetchPageFromCaas() for this case.
-              // This function tries to fetch the page in the CaaS several times. If it is found, it navigates to it.
+              // This function tries to fetch the page in the CaaS. If it is found, it navigates to it.
               // Otherwise, an error message is displayed.
               if (hybrisPageId === elementStatus.uid) {
                 const caasResult = (await this.fetchPageFromCaas(hybrisPageId)) as FsCmsPageInterface;
@@ -75,7 +72,13 @@ export class TppEventHandlerService {
                   this.tppWrapperService.showEditDialog(previewId);
                 }
               }
-              if ((await this.previewPageService.navigateTo(hybrisPageId)) !== true) {
+              let currentElementStatus;
+              let currentHybrisPageId;
+              if (currentPreviewId) {
+                currentElementStatus = await this.tppWrapperService.getElementStatus(currentPreviewId);
+                currentHybrisPageId = await this.tppWrapperService.getHybrisPageId(currentElementStatus.uid);
+              }
+              if (currentHybrisPageId !== hybrisPageId && (await this.previewPageService.navigateTo(hybrisPageId)) !== true) {
                 console.warn(`Could not navigate to the element with previewId '${previewId}' (hybris page id '${hybrisPageId}')`);
                 showPageNotAvailableErrorMessage();
               }
@@ -91,18 +94,13 @@ export class TppEventHandlerService {
               elementStatusString: JSON.stringify(elementStatus),
             });
           }
+          // Set the new Preview Id and change Language.
+          await this.tppWrapperService.setPreviewElement(previewId);
+          const lang = await this.tppWrapperService.getPreviewLanguage();
+          this.languageService.setActive(lang.toLocaleLowerCase());
         }
       });
     });
-  }
-
-  private getByUidResponseHandler(caasResponse: any): any {
-    const firstCaasDocument = findDocumentsInCaasResponse(caasResponse)[0];
-    return iif(
-      () => firstCaasDocument == null,
-      throwError('The requested page is not available yet (the CaaS response was empty)'),
-      of(firstCaasDocument)
-    );
   }
 
   private async fetchPageFromCaas(pageUid: string): Promise<any> {
@@ -110,8 +108,8 @@ export class TppEventHandlerService {
     const activeLanguageObservable = this.languageService.getActive().pipe(take(1));
     return combineLatest([caasClientFactoryObservable, activeLanguageObservable])
       .pipe(
-        switchMap(([caasClient, lang]) => reExecutable(bind(caasClient.getByUid, caasClient), this.getByUidResponseHandler)(pageUid, lang)),
-        switchMap((result) => result),
+        switchMap(([caasClient, lang]) => caasClient.getByUid(pageUid, lang)),
+        map((caasResponse) => findDocumentsInCaasResponse(caasResponse)[0]),
         first()
       )
       .toPromise()

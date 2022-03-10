@@ -46,8 +46,8 @@ describe('FsEditingOverlayComponent', () => {
         },
         {
           provide: BaseSiteService,
-          useValue: MockBaseSiteService
-        }
+          useValue: MockBaseSiteService,
+        },
       ],
     }).compileComponents();
   });

@@ -6,6 +6,12 @@ import { FsCmsPageInterface } from './fs-cms-page.interface';
 import { FS_CMS_PAGE_LANGUAGE_FALLBACK_REPLACER, FS_CMS_PAGE_NORMALIZER, FS_CMS_PAGE_PREPARER } from './fs-cms-page.converter';
 import { Injectable, NgZone } from '@angular/core';
 
+/**
+ * This adapter reloads the CMS data when a change in the FirstSpirit content was triggered.
+ *
+ * @export
+ * @class FsCmsPageChangeAdapter
+ */
 @Injectable({
   providedIn: 'root',
 })

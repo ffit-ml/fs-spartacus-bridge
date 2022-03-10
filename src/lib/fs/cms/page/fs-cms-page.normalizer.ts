@@ -5,6 +5,12 @@ import { Child, FsCmsPageInterface, Value } from './fs-cms-page.interface';
 import { merge, Seq } from 'immutable';
 import { FsComponentConverter } from 'fs-spartacus-common';
 
+/**
+ * This converter prepares the content data by transforming the FirstSpirit data in data that can be used by Spartacus.
+ *
+ * @export
+ * @class FsCmsPageNormalizer
+ */
 @Injectable({ providedIn: 'root' })
 export class FsCmsPageNormalizer implements Converter<FsCmsPageInterface, CmsStructureModel> {
   private source: FsCmsPageInterface;
