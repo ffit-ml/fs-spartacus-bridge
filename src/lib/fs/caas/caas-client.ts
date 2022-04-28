@@ -47,8 +47,14 @@ export class CaasClient {
                         {'locale.language':'${language}'},
                         ${country?.length === 2 ? '{\'locale.country\': \'' + country + '\'}' : ''}
                       ]},
-                      {'page.formData.pt_seoUrl.value':'${altName || uid}'},
-                      {'page.formData.pt_seoUrl.value':'${altName || uid?.toLocaleLowerCase()}'}
+                      {'$and':[
+                        {'$or':[
+                          {'page.formData.pt_seoUrl.value':'${altName || uid}'},
+                          {'page.formData.pt_seoUrl.value':'${altName || uid?.toLocaleLowerCase()}'}
+                        ]},
+                        {'locale.language':'${language}'},
+                        ${country?.length === 2 ? '{\'locale.country\': \'' + country + '\'}' : ''}
+                      ]},
                     ]}`,
         },
       })
@@ -88,8 +94,14 @@ export class CaasClient {
                         {'locale.language':'${language}'},
                         {'locale.country': '${country}'}
                       ]},
-                      {'page.formData.pt_seoUrl.value':'${altName || uid}'},
-                      {'page.formData.pt_seoUrl.value':'${altName || uid?.toLocaleLowerCase()}'}
+                      {'$and':[
+                        {'$or':[
+                          {'page.formData.pt_seoUrl.value':'${altName || uid}'},
+                          {'page.formData.pt_seoUrl.value':'${altName || uid?.toLocaleLowerCase()}'}
+                        ]},
+                        {'locale.language':'${language}'},
+                        {'locale.country': '${country}'}
+                      ]},
                     ]}`,
           rep: 's',
           keys: `{'page.children.children':1}`,
